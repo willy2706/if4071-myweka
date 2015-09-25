@@ -24,10 +24,10 @@ public class Main {
 
 
         /*what we will use*/
-        MyJ48Classifier myJ48Classifier = new MyJ48Classifier();
-        myJ48Classifier.buildClassifier(trainInstances);
+        MyJ48 myJ48 = new MyJ48();
+        myJ48.buildClassifier(trainInstances);
         datasource = new DataSource(TESTDATASETJ48);
         Instances testInstances = datasource.getDataSet();
-        evaluation.evaluateModel(myJ48Classifier,testInstances);
+        evaluation.evaluateModel(myJ48,testInstances);
     }
 }

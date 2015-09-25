@@ -1,17 +1,15 @@
 import weka.classifiers.Classifier;
-import weka.classifiers.trees.J48;
-import weka.classifiers.trees.j48.ClassifierTree;
 import weka.core.Instance;
 import weka.core.Instances;
 
 /**
  * Created by nim_13512065 on 9/25/15.
  */
-public class MyJ48Classifier extends Classifier {
+public class MyJ48 extends Classifier {
 
     private MyJ48ClassifierTree root;
 
-    public MyJ48Classifier() {
+    public MyJ48() {
 
     }
 
