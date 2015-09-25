@@ -1,5 +1,4 @@
-import weka.classifiers.trees.j48.ClassifierTree;
-import weka.classifiers.trees.j48.ModelSelection;
+import weka.core.Instance;
 import weka.core.Instances;
 
 /**
@@ -8,20 +7,23 @@ import weka.core.Instances;
  */
 public class MyJ48ClassifierTree {
     private MyJ48ClassifierTree[] sons;
-    private final ModelSelection modelSelection;
 
-    public MyJ48ClassifierTree (ModelSelection modelSelection) {
-        this.modelSelection = modelSelection;
+    public MyJ48ClassifierTree () {
     }
 
     public void buildClassifier(Instances data) {
         //TODO
     }
 
-    /**
-     * ini parameternya sesuaikan dengan kebutuhan aja
-     */
-    public void buildTree() {
+
+    public double classifyInstance(Instance instance) {
         //TODO
+        return 0;
+    }
+
+    //distribusi kelas di leaf (instance) untuk kelas tertentu
+    public double[] distributionForInstance(Instance instance) {
+        //TODO
+        return null;
     }
 }

@@ -1,4 +1,5 @@
 import weka.classifiers.Classifier;
+import weka.core.Capabilities;
 import weka.core.Instance;
 import weka.core.Instances;
 
@@ -10,25 +11,40 @@ public class MyJ48 extends Classifier {
     private MyJ48ClassifierTree root;
 
     public MyJ48() {
-
+        root = new MyJ48ClassifierTree();
     }
 
     @Override
     public void buildClassifier(Instances data) throws Exception {
-        MyJ48ModelSelection myJ48ModelSelection = new MyJ48ModelSelection(data);
-        root = new MyJ48ClassifierTree(myJ48ModelSelection);
         root.buildClassifier(data);
     }
 
     @Override
     public double[] distributionForInstance(Instance instance) {
-        //TODO
-        return null;
+        return root.distributionForInstance(instance);
     }
 
     @Override
     public double classifyInstance(Instance instance) {
-        //TODO
-        return 0;
+        return root.classifyInstance(instance);
     }
+
+    @Override
+    public Capabilities getCapabilities() {
+        Capabilities result = new Capabilities(this);
+        result.disableAll();
+        // attributes
+        result.enable(Capabilities.Capability.NOMINAL_ATTRIBUTES);
+        result.enable(Capabilities.Capability.NUMERIC_ATTRIBUTES);
+
+        // class
+        result.enable(Capabilities.Capability.NOMINAL_CLASS);
+//        result.enable(Capabilities.Capability.MISSING_CLASS_VALUES);
+
+        // instances
+        result.setMinimumNumberInstances(0);
+
+        return result;
+    }
+
 }
