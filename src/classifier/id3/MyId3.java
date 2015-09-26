@@ -1,5 +1,6 @@
 package classifier.id3;
 
+import common.util.EntropyCalcUtil;
 import weka.classifiers.Classifier;
 import weka.core.*;
 
@@ -50,7 +51,7 @@ public class MyId3 extends Classifier {
             Enumeration attrIterator = data.enumerateAttributes(); // Attribute enumeration without class attribute
             while (attrIterator.hasMoreElements()) {
                 Attribute att = (Attribute) attrIterator.nextElement();
-                infoGains[att.index()] = calcInfoGain(data, att);
+                infoGains[att.index()] = EntropyCalcUtil.calcInfoGain(data, att);
             }
             _splittingAttribute = data.attribute(Utils.maxIndex(infoGains)); // Return the first index with biggest value
 
@@ -68,67 +69,6 @@ public class MyId3 extends Classifier {
             }
 
         }
-    }
-
-    private double calcInfoGain(Instances data, Attribute attr) {
-
-        Instances[] splitData = splitDataByAttr(data, attr);
-
-        double infoGain = calcEntropy(data);
-        for (int i = 0; i < attr.numValues(); i++) {
-            if (splitData[i].numInstances() > 0) {
-                infoGain -= (double) splitData[i].numInstances() /
-                        (double) data.numInstances() * calcEntropy(splitData[i]);
-            }
-        }
-        return infoGain;
-
-    }
-
-    private double calcEntropy(Instances data) {
-        // Entropy is zero if no instance, prevent divided by zero
-        if (data.numInstances() == 0) return 0.0;
-
-        double[] classCounts = new double[data.numClasses()];
-        Enumeration instanceIterator = data.enumerateInstances();
-        int totalInstance = 0;
-        while (instanceIterator.hasMoreElements()) {
-            Instance inst = (Instance) instanceIterator.nextElement();
-            classCounts[(int) inst.classValue()]++;
-            totalInstance++;
-        }
-        /**
-         * total = a,b,c
-         * info([a,c,b]) = entropy(a,b,c)
-         * info([a,b,c]) = -a/total*log(a/total) -b/total*log(b/total) - c/total*log(c/total)
-         */
-        double entropy = 0;
-        for (int j = 0; j < data.numClasses(); j++) {
-            double fraction = classCounts[j] / totalInstance;
-            entropy -= fraction * Utils.log2(fraction);
-        }
-
-        return entropy;
-    }
-
-    private Instances[] splitDataByAttr(Instances data, Attribute attr) {
-
-        Instances[] splitedData = new Instances[attr.numValues()];
-        for (int i = 0; i < attr.numValues(); i++) {
-            splitedData[i] = new Instances(data, data.numInstances()); // initialize with data template and max capacity
-        }
-
-        Enumeration instanceIterator = data.enumerateInstances();
-        while (instanceIterator.hasMoreElements()) {
-            Instance instance = (Instance) instanceIterator.nextElement();
-            splitedData[(int) instance.value(attr)].add(instance);
-        }
-
-        for (Instances instances : splitedData) {
-            instances.compactify(); // to reduce array size to fit num of instances
-        }
-
-        return splitedData;
     }
 
     @Override
