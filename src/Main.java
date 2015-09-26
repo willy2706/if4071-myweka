@@ -17,17 +17,19 @@ public class Main {
         trainInstances.setClassIndex(trainInstances.numAttributes()-1);
         Evaluation evaluation = new Evaluation(trainInstances);
 
-        /*sample*/
-        J48 classifier = new J48();
-        classifier.buildClassifier(trainInstances);
-        evaluation.evaluateModel(classifier, trainInstances);
+//        /*sample*/
+//        J48 classifier = new J48();
+//        classifier.buildClassifier(trainInstances);
+//        evaluation.evaluateModel(classifier, trainInstances);
 
 
         /*what we will use*/
         MyJ48 myJ48 = new MyJ48();
         myJ48.buildClassifier(trainInstances);
-        datasource = new DataSource(TESTDATASETJ48);
-        Instances testInstances = datasource.getDataSet();
-        evaluation.evaluateModel(myJ48,testInstances);
+//        datasource = new DataSource(TESTDATASETJ48);
+//        Instances testInstances = datasource.getDataSet();
+        evaluation.evaluateModel(myJ48,trainInstances);
+
+        System.out.print("");
     }
 }
