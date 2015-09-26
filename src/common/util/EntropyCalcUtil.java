@@ -24,12 +24,25 @@ public class EntropyCalcUtil {
             }
         }
         return infoGain;
-
     }
 
-    public static double calcGainRatio(Instances data, Attribute attr) {
-        // TODO implement
-        return 0.0;
+    private static double calcInstrinsicValue (Instances data, Attribute attr) {
+        Instances[] splitData = splitDataByAttr(data, attr);
+
+        double instrinsicValue = 0.0;
+
+        for (int i = 0; i < attr.numValues(); ++i) {
+            if (splitData[i].numInstances()>0) {
+                double frac = (double)splitData[i].numInstances()/(double)data.numInstances();
+                instrinsicValue -= frac * Utils.log2(frac);
+            }
+        }
+
+        return instrinsicValue;
+    }
+
+    public static double calcGainRatio (Instances data, Attribute attr) {
+        return calcInfoGain(data, attr) /calcInstrinsicValue(data, attr);
     }
 
     public static double calcEntropy(Instances data) {
