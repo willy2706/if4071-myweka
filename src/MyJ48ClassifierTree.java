@@ -24,8 +24,8 @@ public class MyJ48ClassifierTree {
     }
 
     public void buildClassifier(Instances data) {
-        if (data.numInstances() > 0) {
-
+        if (data.numInstances() == 0) {
+            //TODO
         } else {
             int numAttr = data.numAttributes();
             if (numAttr == 1) { //berarti ini dijadikan leaf
