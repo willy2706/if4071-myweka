@@ -58,7 +58,7 @@ public class EntropyCalcUtil {
         return entropy;
     }
 
-    private static Instances[] splitDataByAttr(Instances data, Attribute attr) {
+    public static Instances[] splitDataByAttr(Instances data, Attribute attr) {
 
         Instances[] splitedData = new Instances[attr.numValues()];
         for (int i = 0; i < attr.numValues(); i++) {
