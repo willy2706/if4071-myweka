@@ -52,7 +52,9 @@ public class EntropyCalcUtil {
         double entropy = 0;
         for (int j = 0; j < data.numClasses(); j++) {
             double fraction = classCounts[j] / totalInstance;
-            entropy -= fraction * Utils.log2(fraction);
+            if (fraction != 0) {
+                entropy -= fraction * Utils.log2(fraction);
+            }
         }
 
         return entropy;
