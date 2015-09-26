@@ -18,6 +18,7 @@ public class MyJ48 extends Classifier {
 
     @Override
     public void buildClassifier(Instances data) throws Exception {
+        getCapabilities().testWithFail(data);
         root.buildClassifier(data);
     }
 
