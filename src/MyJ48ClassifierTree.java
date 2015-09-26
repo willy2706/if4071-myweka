@@ -25,10 +25,19 @@ public class MyJ48ClassifierTree {
 
     public void buildClassifier(Instances data) {
         if (data.numInstances() == 0) {
+            System.out.println("todo woi");
             //TODO
         } else {
             int numAttr = data.numAttributes();
-            if (numAttr == 1) { //berarti ini dijadikan leaf
+            double[] gainRatios = new double[numAttr];
+            Enumeration enumeration = data.enumerateAttributes();
+            while (enumeration.hasMoreElements()) {
+                Attribute attribute = (Attribute) enumeration.nextElement();
+                gainRatios[attribute.index()] = EntropyCalcUtil.calcGainRatio(data, attribute);
+            }
+
+            int indexLargestGainRatio = Utils.maxIndex(gainRatios);
+            if (Utils.eq(0,EntropyCalcUtil.calcGainRatio(data,data.attribute(indexLargestGainRatio)))) { //berarti ini dijadikan leaf
                 classDistribution = new double[data.numClasses()];
                 Enumeration instanceIterator = data.enumerateInstances();
                 while (instanceIterator.hasMoreElements()) {
@@ -39,14 +48,6 @@ public class MyJ48ClassifierTree {
 
                 decisionIndex = Utils.maxIndex(classDistribution);
             } else { //recursive part
-                double[] gainRatios = new double[numAttr];
-                Enumeration enumeration = data.enumerateAttributes();
-                while (enumeration.hasMoreElements()) {
-                    Attribute attribute = (Attribute) enumeration.nextElement();
-                    gainRatios[attribute.index()] = EntropyCalcUtil.calcGainRatio(data, attribute);
-                }
-
-                int indexLargestGainRatio = Utils.maxIndex(gainRatios);
                 splittedAttribute = data.attribute(indexLargestGainRatio);
 
                 int numChildrenAndIndex = splittedAttribute.numValues();
