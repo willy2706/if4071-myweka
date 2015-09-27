@@ -43,7 +43,7 @@ public class EntropyCalcUtil {
 
     public static double calcGainRatio (Instances data, Attribute attr) {
         double infogain = calcInfoGain(data, attr);
-        if (Math.abs(infogain-0.0) < 0.0000001) return 0.0;
+        if (Utils.eq(0.0, infogain)) return 0.0;
         return calcInfoGain(data, attr) /calcInstrinsicValue(data, attr);
     }
 

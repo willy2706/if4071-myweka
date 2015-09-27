@@ -31,7 +31,6 @@ public class Main {
 //        datasource = new DataSource(TESTDATASETJ48);
 //        Instances testInstances = datasource.getDataSet();
         evaluation.evaluateModel(myJ48,trainInstances);
-
-        System.out.print("");
+        System.out.print(evaluation.toSummaryString());
     }
 }
