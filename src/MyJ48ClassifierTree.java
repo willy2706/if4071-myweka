@@ -1,12 +1,9 @@
 import common.util.EntropyCalcUtil;
-import weka.classifiers.Classifier;
-import weka.classifiers.Evaluation;
 import weka.core.Attribute;
 import weka.core.Instance;
 import weka.core.Instances;
 import weka.core.Utils;
 
-import javax.rmi.CORBA.Util;
 import java.util.Enumeration;
 
 /**
@@ -21,20 +18,20 @@ public class MyJ48ClassifierTree {
     private double[] classDistribution;
     private Instances _data;
     public MyJ48ClassifierTree () {
-        decisionIndex = null;
+        setDecisionIndex(null);
         setChildren(null);
-        classDistribution = null;
+        setClassDistribution(null);
         setSplittedAttribute(null);
     }
 
     public MyJ48ClassifierTree (MyJ48ClassifierTree myJ48ClassifierTree) {
-        decisionIndex = myJ48ClassifierTree.decisionIndex;
+        setDecisionIndex(myJ48ClassifierTree.getDecisionIndex());
         splittedAttribute = myJ48ClassifierTree.splittedAttribute;
-        int classDistributionLength = myJ48ClassifierTree.classDistribution.length;
+        int classDistributionLength = myJ48ClassifierTree.getClassDistribution().length;
         if (classDistributionLength > 0) {
-            classDistribution = new double[classDistributionLength ];
+            setClassDistribution(new double[classDistributionLength ]);
             for (int i = 0; i < classDistributionLength ; ++i) {
-                classDistribution[i] = myJ48ClassifierTree.classDistribution[i];
+                getClassDistribution()[i] = myJ48ClassifierTree.getClassDistribution()[i];
             }
 
         }
@@ -70,15 +67,15 @@ public class MyJ48ClassifierTree {
 
             int indexLargestGainRatio = Utils.maxIndex(gainRatios);
             if (Utils.eq(0,EntropyCalcUtil.calcGainRatio(data,data.attribute(indexLargestGainRatio)))) { //berarti ini dijadikan leaf
-                classDistribution = new double[data.numClasses()];
+                setClassDistribution(new double[data.numClasses()]);
                 Enumeration instanceIterator = data.enumerateInstances();
                 while (instanceIterator.hasMoreElements()) {
                     Instance instance = (Instance) instanceIterator.nextElement();
-                    classDistribution[(int) instance.classValue()]++;
+                    getClassDistribution()[(int) instance.classValue()]++;
                 }
-                Utils.normalize(classDistribution);
+                Utils.normalize(getClassDistribution());
 
-                decisionIndex = Utils.maxIndex(classDistribution);
+                setDecisionIndex(Utils.maxIndex(getClassDistribution()));
             } else { //recursive part
                 setSplittedAttribute(data.attribute(indexLargestGainRatio));
 
@@ -89,6 +86,7 @@ public class MyJ48ClassifierTree {
                     getChildren()[i] = new MyJ48ClassifierTree();
                     getChildren()[i].buildClassifier(instancesSplitted[i]);
                 }
+
             }
             prune();
         }
@@ -122,8 +120,8 @@ public class MyJ48ClassifierTree {
             if (currErrorRate > prunedErrorRate) {
                 setChildren(null);
                 setSplittedAttribute(null);
-                decisionIndex = _decisonIndex;
-                classDistribution = _classDistribution;
+                setDecisionIndex(_decisonIndex);
+                setClassDistribution(_classDistribution);
             }
 
         }
@@ -131,10 +129,10 @@ public class MyJ48ClassifierTree {
 
     public double classifyInstance(Instance instance) {
         //jika rekursif
-        if (decisionIndex == null && getSplittedAttribute() != null) {
+        if (getDecisionIndex() == null && getSplittedAttribute() != null) {
             double idxSplittedAttr = instance.value(getSplittedAttribute());
             return getChildren()[(int)idxSplittedAttr].classifyInstance(instance);
-        } else return decisionIndex;
+        } else return getDecisionIndex();
     }
 
     public double errorRate (Instances instances) {
@@ -157,10 +155,10 @@ public class MyJ48ClassifierTree {
     }
 
     public double[] distributionForInstance(Instance instance) {
-        if (classDistribution == null && getSplittedAttribute() != null) {
+        if (getClassDistribution() == null && getSplittedAttribute() != null) {
             double idxSplittedAttr = instance.value(getSplittedAttribute());
             return getChildren()[(int)idxSplittedAttr].distributionForInstance(instance);
-        } else return classDistribution;
+        } else return getClassDistribution();
     }
 
     public Attribute getSplittedAttribute() {
@@ -177,5 +175,21 @@ public class MyJ48ClassifierTree {
 
     public void setChildren(MyJ48ClassifierTree[] children) {
         this.children = children;
+    }
+
+    public Integer getDecisionIndex() {
+        return decisionIndex;
+    }
+
+    public void setDecisionIndex(Integer decisionIndex) {
+        this.decisionIndex = decisionIndex;
+    }
+
+    public double[] getClassDistribution() {
+        return classDistribution;
+    }
+
+    public void setClassDistribution(double[] classDistribution) {
+        this.classDistribution = classDistribution;
     }
 }
