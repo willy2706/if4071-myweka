@@ -111,37 +111,25 @@ public class EntropyCalcUtil {
         add.setInputFormat(newData);
         newData = Filter.useFilter(newData, add);
         
-        double maxValues = max(data,attribute);
-        double minValues = min(data,attribute);
-        double threshold = (maxValues-minValues)/2; //binary split
-        for(int i=0;i<data.numInstances();i++) {
-            if(data.instance(i).value(attribute) >= threshold) {
-                newData.instance(i).setValue(newData.attribute("atributPengganti"+attribute.name()), "A");
-            }
-            else {
-                newData.instance(i).setValue(newData.attribute("atributPengganti"+attribute.name()), "B");
-            }
-        }
-        return calcGainRatio(newData, attribute);
-    }
-
-    private static double max(Instances data, Attribute attribute) {
-        double maxValue = data.instance(0).value(attribute);
-        for(int i=1;i<data.numInstances();i++) {
-            if(data.instance(i).value(attribute) > maxValue) {
-                maxValue = data.instance(i).value(attribute);
+        double threshold;
+        double gainRatio=0.0;
+        for(int i=0;i<data.numInstances()-1;i++) {
+            if(data.instance(i).classValue()!=data.instance(i+1).classValue()) {
+                threshold = (data.instance(i).classValue()+data.instance(i+1).classValue())/2;
+                for(int j=0;j<data.numInstances();j++) {
+                    if(data.instance(j).value(attribute) >= threshold) {
+                        newData.instance(j).setValue(newData.attribute("atributPengganti"+attribute.name()), "A");
+                    }
+                    else {
+                        newData.instance(j).setValue(newData.attribute("atributPengganti"+attribute.name()), "B");
+                    }
+                }
+                if(calcGainRatio(newData, newData.attribute("atributPengganti"+attribute.name()))>gainRatio) {
+                    gainRatio = calcGainRatio(newData, attribute);
+                }
             }
         }
-        return maxValue;
-    }
-
-    private static double min(Instances data, Attribute attribute) {
-        double minValue = data.instance(0).value(attribute);
-        for(int i=1;i<data.numInstances();i++) {
-            if(data.instance(i).value(attribute) < minValue) {
-                minValue = data.instance(i).value(attribute);
-            }
-        }
-        return minValue;
+        
+        return gainRatio;
     }
 }
