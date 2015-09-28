@@ -28,7 +28,7 @@ public class EntropyCalcUtil {
         return infoGain;
     }
 
-    private static double calcInstrinsicValue (Instances data, Attribute attr) {
+    private static double calcIntrinsicValue(Instances data, Attribute attr) {
         Instances[] splitData = splitDataByAttr(data, attr);
 
         double instrinsicValue = 0.0;
@@ -46,7 +46,7 @@ public class EntropyCalcUtil {
     public static double calcGainRatio (Instances data, Attribute attr) {
         double infogain = calcInfoGain(data, attr);
         if (Utils.eq(0.0, infogain)) return 0.0;
-        return calcInfoGain(data, attr) /calcInstrinsicValue(data, attr);
+        return calcInfoGain(data, attr) / calcIntrinsicValue(data, attr);
     }
 
     public static double calcEntropy(Instances data) {

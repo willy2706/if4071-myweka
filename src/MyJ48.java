@@ -1,5 +1,8 @@
+import common.util.EntropyCalcUtil;
+import weka.classifiers.Evaluation;
 import weka.classifiers.trees.J48;
 import weka.classifiers.Classifier;
+import weka.core.Attribute;
 import weka.core.Capabilities;
 import weka.core.Instance;
 import weka.core.Instances;
@@ -16,11 +19,13 @@ public class MyJ48 extends Classifier {
         root = new MyJ48ClassifierTree();
     }
 
+
     @Override
     public void buildClassifier(Instances data) throws Exception {
         getCapabilities().testWithFail(data);
         root.buildClassifier(data);
     }
+
 
     @Override
     public double[] distributionForInstance(Instance instance) {

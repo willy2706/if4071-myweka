@@ -20,7 +20,7 @@ public class Main {
 
 
 //        /*sample*/
-//        J48 classifier = new J48();
+        J48 classifier = new J48();
 //        classifier.buildClassifier(trainInstances);
 //        evaluation.evaluateModel(classifier, trainInstances);
 
@@ -31,6 +31,6 @@ public class Main {
 //        datasource = new DataSource(TESTDATASETJ48);
 //        Instances testInstances = datasource.getDataSet();
         evaluation.evaluateModel(myJ48,trainInstances);
-        System.out.print(evaluation.toSummaryString());
+        System.out.print(evaluation.errorRate());
     }
 }
