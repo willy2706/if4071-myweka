@@ -11,7 +11,7 @@ import weka.core.converters.ConverterUtils.DataSource;
 public class Main {
     public final static String FOLDER = "myweka/dataset/";
     public final static String TRAINDATASETJ48 = FOLDER + "weather.nominal.arff";
-    public final static String TESTDATASETJ48 = FOLDER + "<isisendiri>.arff";
+    public final static String TESTDATASETJ48 = FOLDER + "test.weather.nominal.arff";
     public static void main(String[] args) throws Exception {
         DataSource datasource = new DataSource(TRAINDATASETJ48);
         Instances trainInstances = datasource.getDataSet();
@@ -20,7 +20,7 @@ public class Main {
 
 
 //        /*sample*/
-//        J48 classifier = new J48();
+        J48 classifier = new J48();
 //        classifier.buildClassifier(trainInstances);
 //        evaluation.evaluateModel(classifier, trainInstances);
 
@@ -28,9 +28,10 @@ public class Main {
         /*what we will use*/
         MyJ48 myJ48 = new MyJ48();
         myJ48.buildClassifier(trainInstances);
-//        datasource = new DataSource(TESTDATASETJ48);
-//        Instances testInstances = datasource.getDataSet();
-        evaluation.evaluateModel(myJ48,trainInstances);
-        System.out.print(evaluation.toSummaryString());
+        datasource = new DataSource(TESTDATASETJ48);
+        Instances testInstances = datasource.getDataSet();
+        testInstances.setClassIndex(testInstances.numAttributes()-1);
+        evaluation.evaluateModel(myJ48, testInstances);
+        System.out.print(evaluation.toMatrixString());
     }
 }
