@@ -48,9 +48,7 @@ public class MyJ48ClassifierTree {
     public void buildClassifier(Instances data) throws Exception {
         this._data = data;
         if (data.numInstances() == 0) {
-            System.out.println("todo woi");
-            //TODO ini kalo di root, jadi ga bisa di build classifiernya
-            // tapi kalo di leaf bakal di hitung pake probabilitas yang rumusnya belum ketemu
+            setDecisionIndex(-999);
         } else {
             int numAttr = data.numAttributes();
             double[] gainRatios = new double[numAttr];
@@ -87,6 +85,21 @@ public class MyJ48ClassifierTree {
                     getChildren()[i].buildClassifier(instancesSplitted[i]);
                 }
 
+                for (int i = 0; i < numChildrenAndIndex; ++i) {
+                    if (getChildren()[i].getDecisionIndex() != null && Utils.eq(getChildren()[i].getDecisionIndex(), -999)) {
+                        double[] _classDistribution = new double[_data.numClasses()];
+                        Enumeration instanceIterator = _data.enumerateInstances();
+                        while (instanceIterator.hasMoreElements()) {
+                            Instance instance = (Instance) instanceIterator.nextElement();
+                            _classDistribution[(int) instance.classValue()]++;
+                        }
+                        Utils.normalize(_classDistribution);
+                        int _decisonIndex = Utils.maxIndex(_classDistribution);
+
+                        getChildren()[i].setDecisionIndex(_decisonIndex);
+                        getChildren()[i].setClassDistribution(_classDistribution);
+                    }
+                }
             }
             prune();
         }
