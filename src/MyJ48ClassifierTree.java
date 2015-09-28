@@ -23,7 +23,7 @@ public class MyJ48ClassifierTree {
         classDistribution = null;
     }
 
-    public void buildClassifier(Instances data) {
+    public void buildClassifier(Instances data) throws Exception {
         if (data.numInstances() == 0) {
             System.out.println("todo woi");
             //TODO ini kalo di root, jadi ga bisa di build classifiernya
