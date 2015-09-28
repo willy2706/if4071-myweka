@@ -26,14 +26,20 @@ public class MyJ48ClassifierTree {
     public void buildClassifier(Instances data) {
         if (data.numInstances() == 0) {
             System.out.println("todo woi");
-            //TODO
+            //TODO ini kalo di root, jadi ga bisa di build classifiernya
+            // tapi kalo di leaf bakal di hitung pake probabilitas yang rumusnya belum ketemu
         } else {
             int numAttr = data.numAttributes();
             double[] gainRatios = new double[numAttr];
             Enumeration enumeration = data.enumerateAttributes();
             while (enumeration.hasMoreElements()) {
                 Attribute attribute = (Attribute) enumeration.nextElement();
-                gainRatios[attribute.index()] = EntropyCalcUtil.calcGainRatio(data, attribute);
+                if (attribute.isNominal()) {
+                    gainRatios[attribute.index()] = EntropyCalcUtil.calcGainRatio(data, attribute);
+                }
+                else if(attribute.isNumeric()) {
+                    gainRatios[attribute.index()] = EntropyCalcUtil.calcNumericGainRatio(data,attribute);
+                }
             }
 
             int indexLargestGainRatio = Utils.maxIndex(gainRatios);

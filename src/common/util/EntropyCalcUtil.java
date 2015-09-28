@@ -94,4 +94,39 @@ public class EntropyCalcUtil {
 
         return splitedData;
     }
+
+    public static double calcNumericGainRatio(Instances data, Attribute attribute) {
+        double maxValues = max(data,attribute);
+        double minValues = min(data,attribute);
+        double threshold = (maxValues-minValues)/2; //binary split
+        for(int i=0;i<data.numInstances();i++) {
+            if(data.instance(i).value(attribute) >= threshold) {
+                data.instance(i).setValue(attribute, "greaterThan"+threshold);
+            }
+            else {
+                data.instance(i).setValue(attribute, "lessThan"+threshold);
+            }
+        }
+        return calcGainRatio(data, attribute);
+    }
+
+    private static double max(Instances data, Attribute attribute) {
+        double maxValue = data.instance(0).value(attribute);
+        for(int i=1;i<data.numInstances();i++) {
+            if(data.instance(i).value(attribute) > maxValue) {
+                maxValue = data.instance(i).value(attribute);
+            }
+        }
+        return maxValue;
+    }
+
+    private static double min(Instances data, Attribute attribute) {
+        double minValue = data.instance(0).value(attribute);
+        for(int i=1;i<data.numInstances();i++) {
+            if(data.instance(i).value(attribute) < minValue) {
+                minValue = data.instance(i).value(attribute);
+            }
+        }
+        return minValue;
+    }
 }
