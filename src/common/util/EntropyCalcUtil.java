@@ -115,7 +115,8 @@ public class EntropyCalcUtil {
         double gainRatio=0.0;
         for(int i=0;i<data.numInstances()-1;i++) {
             if(data.instance(i).classValue()!=data.instance(i+1).classValue()) {
-                threshold = (data.instance(i).classValue()+data.instance(i+1).classValue())/2;
+                threshold = (data.instance(i).value(attribute)+data.instance(i+1).value(attribute))/2;
+                newData = new Instances(replaceMissingValues(newData,attribute));
                 for(int j=0;j<data.numInstances();j++) {
                     if(data.instance(j).value(attribute) >= threshold) {
                         newData.instance(j).setValue(newData.attribute("atributPengganti"+attribute.name()), "A");
@@ -129,7 +130,46 @@ public class EntropyCalcUtil {
                 }
             }
         }
-        
         return gainRatio;
+    }
+    
+    public static Instances replaceMissingValues(Instances missingValuesReplaced, Attribute attribute) {
+        double missingValueClass=0.0;
+        int[] classes = new int[missingValuesReplaced.numDistinctValues(attribute)];
+        int[] max = new int[missingValuesReplaced.numClasses()];
+        for(int i=0;i<classes.length;i++) {
+            classes[i]=0;
+        }
+        Instances newInstances = new Instances(missingValuesReplaced);
+        for(int i=0;i<missingValuesReplaced.numInstances();i++) {
+            if(missingValuesReplaced.instance(i).isMissing(attribute)) {
+                missingValueClass = missingValuesReplaced.instance(i).classValue();
+                for(int j=0;j<missingValuesReplaced.numInstances();++j) {
+                    if(!missingValuesReplaced.instance(j).isMissing(attribute) && 
+                            missingValuesReplaced.instance(j).classValue()==missingValueClass) {
+                        classes[(int)missingValuesReplaced.instance(j).value(attribute)]++;
+                    }
+                }
+                //cari max dari tabel classes
+                int maxAttributes=0;
+                for(int j=0;j<classes.length;j++) {
+                    if(classes[j]>=maxAttributes) {
+                        maxAttributes = j;
+                    }
+                }
+                //untuk yang kelasnya yes, maxnya adalah atribut maxAttributes
+                max[(int)missingValuesReplaced.instance(i).classValue()] = maxAttributes;
+            }
+            //kosongin tabelnya lagi
+            for(int j=0;j<classes.length;j++) {
+                classes[j]=0;
+            }
+        }
+        for(int i=0;i<missingValuesReplaced.numInstances();i++) {
+            if(newInstances.instance(i).isMissing(attribute)) {
+                newInstances.instance(i).setValue(attribute, max[(int)newInstances.instance(i).classValue()]);
+            }
+        }
+        return newInstances;
     }
 }

@@ -1,10 +1,11 @@
 import common.util.EntropyCalcUtil;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.List;
 import weka.core.Attribute;
 import weka.core.Instance;
 import weka.core.Instances;
 import weka.core.Utils;
-
-import java.util.Enumeration;
 
 /**
  * Created by nim_13512065 on 9/25/15.
@@ -33,9 +34,11 @@ public class MyJ48ClassifierTree {
             double[] gainRatios = new double[numAttr];
             Enumeration enumeration = data.enumerateAttributes();
             while (enumeration.hasMoreElements()) {
+                Instances missingValuesReplaced = new Instances(data);
                 Attribute attribute = (Attribute) enumeration.nextElement();
+                missingValuesReplaced = replaceMissingValues(missingValuesReplaced,attribute);
                 if (attribute.isNominal()) {
-                    gainRatios[attribute.index()] = EntropyCalcUtil.calcGainRatio(data, attribute);
+                    gainRatios[attribute.index()] = EntropyCalcUtil.calcGainRatio(missingValuesReplaced, attribute);
                 }
                 else if(attribute.isNumeric()) {
                     gainRatios[attribute.index()] = EntropyCalcUtil.calcNumericGainRatio(data,attribute);
@@ -81,5 +84,45 @@ public class MyJ48ClassifierTree {
             double idxSplittedAttr = instance.value(splittedAttribute);
             return children[(int)idxSplittedAttr].distributionForInstance(instance);
         } else return classDistribution;
+    }
+
+    public Instances replaceMissingValues(Instances missingValuesReplaced, Attribute attribute) {
+        double missingValueClass=0.0;
+        int[] classes = new int[missingValuesReplaced.numDistinctValues(attribute)];
+        int[] max = new int[missingValuesReplaced.numClasses()];
+        for(int i=0;i<classes.length;i++) {
+            classes[i]=0;
+        }
+        Instances newInstances = new Instances(missingValuesReplaced);
+        for(int i=0;i<missingValuesReplaced.numInstances();i++) {
+            if(missingValuesReplaced.instance(i).isMissing(attribute)) {
+                missingValueClass = missingValuesReplaced.instance(i).classValue();
+                for(int j=0;j<missingValuesReplaced.numInstances();++j) {
+                    if(!missingValuesReplaced.instance(j).isMissing(attribute) && 
+                            missingValuesReplaced.instance(j).classValue()==missingValueClass) {
+                        classes[(int)missingValuesReplaced.instance(j).value(attribute)]++;
+                    }
+                }
+                //cari max dari tabel classes
+                int maxAttributes=0;
+                for(int j=0;j<classes.length;j++) {
+                    if(classes[j]>=maxAttributes) {
+                        maxAttributes = j;
+                    }
+                }
+                //untuk yang kelasnya yes, maxnya adalah atribut maxAttributes
+                max[(int)missingValuesReplaced.instance(i).classValue()] = maxAttributes;
+            }
+            //kosongin tabelnya lagi
+            for(int j=0;j<classes.length;j++) {
+                classes[j]=0;
+            }
+        }
+        for(int i=0;i<missingValuesReplaced.numInstances();i++) {
+            if(newInstances.instance(i).isMissing(attribute)) {
+                newInstances.instance(i).setValue(attribute, max[(int)newInstances.instance(i).classValue()]);
+            }
+        }
+        return newInstances;
     }
 }
