@@ -1,11 +1,13 @@
 package common.util;
 
+import java.util.Enumeration;
 import weka.core.Attribute;
 import weka.core.Instance;
 import weka.core.Instances;
 import weka.core.Utils;
-
-import java.util.Enumeration;
+import weka.filters.Filter;
+import weka.filters.unsupervised.attribute.Add;
+import weka.filters.unsupervised.attribute.Remove;
 
 /**
  * Created by Winson on 9/26/2015.
@@ -95,19 +97,32 @@ public class EntropyCalcUtil {
         return splitedData;
     }
 
-    public static double calcNumericGainRatio(Instances data, Attribute attribute) {
+    public static double calcNumericGainRatio(Instances data, Attribute attribute) throws Exception {
+        Instances newData = new Instances(data);
+        Remove remove = new Remove();
+        Add add = new Add();
+        remove.setAttributeIndices(Integer.toString(attribute.index()));
+        remove.setInputFormat(newData);
+        newData=Filter.useFilter(newData, remove);
+        
+        add.setAttributeIndex("last");
+        add.setNominalLabels("A,B");
+        add.setAttributeName("atributPengganti"+attribute.name());
+        add.setInputFormat(newData);
+        newData = Filter.useFilter(newData, add);
+        
         double maxValues = max(data,attribute);
         double minValues = min(data,attribute);
         double threshold = (maxValues-minValues)/2; //binary split
         for(int i=0;i<data.numInstances();i++) {
             if(data.instance(i).value(attribute) >= threshold) {
-                data.instance(i).setValue(attribute, "greaterThan"+threshold);
+                newData.instance(i).setValue(newData.attribute("atributPengganti"+attribute.name()), "A");
             }
             else {
-                data.instance(i).setValue(attribute, "lessThan"+threshold);
+                newData.instance(i).setValue(newData.attribute("atributPengganti"+attribute.name()), "B");
             }
         }
-        return calcGainRatio(data, attribute);
+        return calcGainRatio(newData, attribute);
     }
 
     private static double max(Instances data, Attribute attribute) {
