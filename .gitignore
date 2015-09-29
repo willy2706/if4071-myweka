@@ -68,3 +68,4 @@ gradlew.bat
 build.xml
 manifest.mf
 nbproject/
+/dist/
