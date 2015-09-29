@@ -248,6 +248,7 @@ public class MyJ48ClassifierTree {
                     }
                 }
             }
+            if (Double.isNaN(idxSplittedAttr)) idxSplittedAttr = 0; //berarti atribut itu ga signifikan
             return getChildren()[(int)idxSplittedAttr].distributionForInstance(instance);
         } else return getClassDistribution();
     }
