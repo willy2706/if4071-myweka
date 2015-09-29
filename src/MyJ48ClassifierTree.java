@@ -17,6 +17,7 @@ public class MyJ48ClassifierTree {
 
     private Integer decisionIndex;
     private double[] classDistribution;
+    private double threshold;
     private Instances _data;
     public MyJ48ClassifierTree () {
         setDecisionIndex(null);
@@ -56,18 +57,26 @@ public class MyJ48ClassifierTree {
             Enumeration enumeration = data.enumerateAttributes();
             while (enumeration.hasMoreElements()) {
                 Instances missingValuesReplaced = new Instances(data);
-                Attribute attribute = (Attribute) enumeration.nextElement();
-                missingValuesReplaced = replaceMissingValues(missingValuesReplaced,attribute);
+                Attribute attribute = (Attribute) enumeration.nextElement();                
                 if (attribute.isNominal()) {
+                    missingValuesReplaced = replaceMissingValues(missingValuesReplaced,attribute);
                     gainRatios[attribute.index()] = EntropyCalcUtil.calcGainRatio(missingValuesReplaced, attribute);
                 }
                 else if(attribute.isNumeric()) {
-                    gainRatios[attribute.index()] = EntropyCalcUtil.calcNumericGainRatio(data,attribute);
+                    setThreshold(searchThreshold(data,attribute));
+                    gainRatios[attribute.index()] = EntropyCalcUtil.calcNumericGainRatio(data,attribute,threshold);
                 }
             }
 
             int indexLargestGainRatio = Utils.maxIndex(gainRatios);
-            if (Utils.eq(0,EntropyCalcUtil.calcGainRatio(data,data.attribute(indexLargestGainRatio)))) { //berarti ini dijadikan leaf
+            double gainRatio;
+            if(data.attribute(indexLargestGainRatio).isNominal()) {
+                gainRatio=EntropyCalcUtil.calcGainRatio(data,data.attribute(indexLargestGainRatio));
+            } 
+            else {
+                gainRatio=EntropyCalcUtil.calcNumericGainRatio(data,data.attribute(indexLargestGainRatio),threshold);
+            }
+            if (Utils.eq(0,gainRatio)) { //berarti ini dijadikan leaf
                 setClassDistribution(new double[data.numClasses()]);
                 Enumeration instanceIterator = data.enumerateInstances();
                 while (instanceIterator.hasMoreElements()) {
@@ -78,11 +87,24 @@ public class MyJ48ClassifierTree {
 
                 setDecisionIndex(Utils.maxIndex(getClassDistribution()));
             } else { //recursive part
+                int numChildrenAndIndex;
                 setSplittedAttribute(data.attribute(indexLargestGainRatio));
-
-                int numChildrenAndIndex = getSplittedAttribute().numValues();
+                if(data.attribute(indexLargestGainRatio).isNumeric()) {                    
+                    numChildrenAndIndex = 2;
+                }
+                else {
+                    numChildrenAndIndex = getSplittedAttribute().numValues();
+                }
                 setChildren(new MyJ48ClassifierTree[numChildrenAndIndex]);
-                Instances[] instancesSplitted = EntropyCalcUtil.splitDataByAttr(data, getSplittedAttribute());
+                Instances[] instancesSplitted;
+                if(data.attribute(indexLargestGainRatio).isNumeric()) {
+                    Instances replacedMissingValues = new Instances(EntropyCalcUtil.replaceMissingValues(data, splittedAttribute));
+                    instancesSplitted = EntropyCalcUtil.splitDataByNumericAttr(replacedMissingValues, getSplittedAttribute(),threshold);
+                }
+                else {
+                    instancesSplitted = EntropyCalcUtil.splitDataByAttr(data, getSplittedAttribute());
+                }
+                
                 for (int i = 0; i < numChildrenAndIndex; ++i) {
                     getChildren()[i] = new MyJ48ClassifierTree();
                     getChildren()[i].buildClassifier(instancesSplitted[i]);
@@ -208,6 +230,14 @@ public class MyJ48ClassifierTree {
     public void setClassDistribution(double[] classDistribution) {
         this.classDistribution = classDistribution;
     }
+    
+    public double getThreshold() {
+        return threshold;
+    }
+    
+    public void setThreshold(double threshold) {
+        this.threshold = threshold;
+    }
 
     public Instances replaceMissingValues(Instances missingValuesReplaced, Attribute attribute) {
         double missingValueClass=0.0;
@@ -247,5 +277,18 @@ public class MyJ48ClassifierTree {
             }
         }
         return newInstances;
+    }
+
+    private double searchThreshold(Instances data, Attribute attribute) throws Exception {
+        double[] threshold = new double[data.numInstances()];
+        double[] gainRatio = new double[data.numInstances()];
+        for(int i=0;i<data.numInstances()-1;++i) {
+            if(data.instance(i).classValue()!=data.instance(i+1).classValue()) {
+                threshold[i] = (data.instance(i).value(attribute)+data.instance(i+1).value(attribute))/2;
+                gainRatio[i] = EntropyCalcUtil.calcNumericGainRatio(data, attribute, threshold[i]);
+                }
+        }
+        double result = (double) threshold[Utils.maxIndex(gainRatio)];
+        return result;
     }
 }

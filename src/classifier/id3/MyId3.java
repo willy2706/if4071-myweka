@@ -36,7 +36,7 @@ public class MyId3 extends Classifier {
         buildTree(data);
     }
 
-    private void buildTree(Instances data) {
+    private void buildTree(Instances data) throws Exception {
         if (data.numInstances() == 0) {
             /**
              * Base part, no instance in node

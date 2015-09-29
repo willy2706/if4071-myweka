@@ -14,11 +14,11 @@ import weka.filters.unsupervised.attribute.Remove;
  */
 public class EntropyCalcUtil {
 
-    public static double calcInfoGain(Instances data, Attribute attr) {
+    public static double calcInfoGain(Instances data, Attribute attr) throws Exception {
 
+        double infoGain=0.0;
         Instances[] splitData = splitDataByAttr(data, attr);
-
-        double infoGain = calcEntropy(data);
+        infoGain = calcEntropy(data);
         for (int i = 0; i < attr.numValues(); i++) {
             if (splitData[i].numInstances() > 0) {
                 infoGain -= (double) splitData[i].numInstances() /
@@ -27,26 +27,60 @@ public class EntropyCalcUtil {
         }
         return infoGain;
     }
+    public static double calcNumericInfoGain(Instances data, Attribute attr,double threshold) throws Exception {
 
-    private static double calcIntrinsicValue(Instances data, Attribute attr) {
-        Instances[] splitData = splitDataByAttr(data, attr);
+        double infoGain=0.0;
+        Instances[] splitData = splitDataByNumericAttr(data, attr, threshold);
+        infoGain = calcEntropy(data);
+        for (int i = 0; i < 2; i++) {
+            if (splitData[i].numInstances() > 0) {
+                infoGain -= (double) splitData[i].numInstances() /
+                        (double) data.numInstances() * calcEntropy(splitData[i]);
+            }
+        }
+        return infoGain;
+    }
 
+    private static double calcIntrinsicValue(Instances data, Attribute attr) throws Exception {
         double instrinsicValue = 0.0;
-
+        Instances[] splitData;
+        splitData = splitDataByAttr(data, attr);
         for (int i = 0; i < attr.numValues(); ++i) {
             if (splitData[i].numInstances()>0) {
                 double frac = (double)splitData[i].numInstances()/(double)data.numInstances();
                 instrinsicValue -= frac * Utils.log2(frac);
             }
         }
-
+        return instrinsicValue;
+    }
+    
+    private static double calcNumericIntrinsicValue(Instances data, Attribute attr,double threshold) throws Exception {
+        double instrinsicValue = 0.0;
+        Instances[] splitData;
+        splitData = splitDataByNumericAttr(data, attr, threshold);
+        for (int i = 0; i < 2; ++i) {
+            if (splitData[i].numInstances()>0) {
+                double frac = (double)splitData[i].numInstances()/(double)data.numInstances();
+                instrinsicValue -= frac * Utils.log2(frac);
+            }
+        }
         return instrinsicValue;
     }
 
-    public static double calcGainRatio (Instances data, Attribute attr) {
-        double infogain = calcInfoGain(data, attr);
+    public static double calcGainRatio (Instances data, Attribute attr) throws Exception {
+        if(attr.isNumeric()) {
+        } else {
+            double infogain = calcInfoGain(data, attr);
+            if (Utils.eq(0.0, infogain)) return 0.0;
+            return calcInfoGain(data, attr) / calcIntrinsicValue(data, attr);
+        }
+        return 0;
+    }
+    
+    public static double calcNumericGainRatio (Instances data, Attribute attr, double threshold) throws Exception {
+        double infogain = calcNumericInfoGain(data, attr,threshold);
         if (Utils.eq(0.0, infogain)) return 0.0;
-        return calcInfoGain(data, attr) / calcIntrinsicValue(data, attr);
+        return calcNumericInfoGain(data, attr, threshold) / calcNumericIntrinsicValue(data, attr, threshold);
     }
 
     public static double calcEntropy(Instances data) {
@@ -96,42 +130,6 @@ public class EntropyCalcUtil {
 
         return splitedData;
     }
-
-    public static double calcNumericGainRatio(Instances data, Attribute attribute) throws Exception {
-        Instances newData = new Instances(data);
-        Remove remove = new Remove();
-        Add add = new Add();
-        remove.setAttributeIndices(Integer.toString(attribute.index()));
-        remove.setInputFormat(newData);
-        newData=Filter.useFilter(newData, remove);
-        
-        add.setAttributeIndex("last");
-        add.setNominalLabels("A,B");
-        add.setAttributeName("atributPengganti"+attribute.name());
-        add.setInputFormat(newData);
-        newData = Filter.useFilter(newData, add);
-        
-        double threshold;
-        double gainRatio=0.0;
-        for(int i=0;i<data.numInstances()-1;i++) {
-            if(data.instance(i).classValue()!=data.instance(i+1).classValue()) {
-                threshold = (data.instance(i).value(attribute)+data.instance(i+1).value(attribute))/2;
-                newData = new Instances(replaceMissingValues(newData,attribute));
-                for(int j=0;j<data.numInstances();j++) {
-                    if(data.instance(j).value(attribute) >= threshold) {
-                        newData.instance(j).setValue(newData.attribute("atributPengganti"+attribute.name()), "A");
-                    }
-                    else {
-                        newData.instance(j).setValue(newData.attribute("atributPengganti"+attribute.name()), "B");
-                    }
-                }
-                if(calcGainRatio(newData, newData.attribute("atributPengganti"+attribute.name()))>gainRatio) {
-                    gainRatio = calcGainRatio(newData, attribute);
-                }
-            }
-        }
-        return gainRatio;
-    }
     
     public static Instances replaceMissingValues(Instances missingValuesReplaced, Attribute attribute) {
         double missingValueClass=0.0;
@@ -171,5 +169,29 @@ public class EntropyCalcUtil {
             }
         }
         return newInstances;
+    }
+
+    public static Instances[] splitDataByNumericAttr(Instances data, Attribute attr, double threshold) throws Exception {        
+        Instances[] splitedData = new Instances[2];
+        for (int i = 0; i < 2; i++) {
+            splitedData[i] = new Instances(data, data.numInstances()); // initialize with data template and max capacity
+        }
+
+        Enumeration instanceIterator = data.enumerateInstances();
+        while (instanceIterator.hasMoreElements()) {
+            Instance instance = (Instance) instanceIterator.nextElement();
+            if(instance.value(attr)>=threshold) {
+                splitedData[1].add(instance);
+            }
+            else {
+                splitedData[0].add(instance);
+            }
+        }
+
+        for (Instances instances : splitedData) {
+            instances.compactify(); // to reduce array size to fit num of instances
+        }
+
+        return splitedData;
     }
 }
