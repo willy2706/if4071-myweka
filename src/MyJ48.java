@@ -1,8 +1,5 @@
-import common.util.EntropyCalcUtil;
 import java.util.Enumeration;
 import weka.classifiers.Classifier;
-import weka.classifiers.Evaluation;
-import weka.classifiers.trees.J48;
 import weka.core.Attribute;
 import weka.core.AttributeStats;
 import weka.core.Capabilities;
@@ -26,7 +23,6 @@ public class MyJ48 extends Classifier {
     public void buildClassifier(Instances data) throws Exception {
         getCapabilities().testWithFail(data);
         Instances copy = new Instances(data);
- 
         // Missing value
         Enumeration attrIterator = data.enumerateAttributes();
         while (attrIterator.hasMoreElements()) {
@@ -47,10 +43,10 @@ public class MyJ48 extends Classifier {
                         instance.setValue(attr.index(),maxIndex);
                     }
                 }
- 
             } else if (attr.isNumeric()){
                 AttributeStats attributeStats = copy.attributeStats(attr.index());
                 double mean = attributeStats.numericStats.mean;
+                if (Double.isNaN(mean)) mean = 0;
                 // Replace missing value with mean
                 Enumeration instEnumerate = copy.enumerateInstances();
                 while(instEnumerate.hasMoreElements()){
@@ -61,7 +57,8 @@ public class MyJ48 extends Classifier {
                 }
             }
         }
-        root.buildClassifier(data);
+
+        root.buildClassifier(copy);
     }
 
 
@@ -82,13 +79,14 @@ public class MyJ48 extends Classifier {
         // attributes
         result.enable(Capabilities.Capability.NOMINAL_ATTRIBUTES);
         result.enable(Capabilities.Capability.NUMERIC_ATTRIBUTES);
+        result.enable(Capabilities.Capability.MISSING_VALUES);
 
         
         result.enable(Capabilities.Capability.MISSING_VALUES);
         
         // class
         result.enable(Capabilities.Capability.NOMINAL_CLASS);
-//        result.enable(Capabilities.Capability.MISSING_CLASS_VALUES);
+        result.enable(Capabilities.Capability.MISSING_CLASS_VALUES);
 
         // instances
         result.setMinimumNumberInstances(0);
