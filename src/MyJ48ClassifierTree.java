@@ -221,10 +221,31 @@ public class MyJ48ClassifierTree {
                 }
             }
             else {
-                if(instance.value(getSplittedAttribute())>=getThreshold()) {
-                    idxSplittedAttr = 1.0;
+                double val = instance.value(getSplittedAttribute());
+                if (Double.isNaN(val)) {
+                    Instances[] instancesSplitted = null;
+                    try {
+                        instancesSplitted = EntropyCalcUtil.splitDataByNumericAttr(_data, getSplittedAttribute(), threshold);
+                        int largestNumIdx = -1;
+                        int cnt = 0;
+                        for (int i = 0; i < instancesSplitted.length; ++i) {
+                            int tmp = instancesSplitted[i].numInstances();
+                            if (tmp > cnt) {
+                                largestNumIdx = i;
+                            }
+                        }
+                        idxSplittedAttr = largestNumIdx;
+                    } catch (Exception e) {
+                        System.out.print("ado kimaklah ini harus solve kalau ketemu masalah ini");
+                        idxSplittedAttr = 0.0;
+                        e.printStackTrace();
+                    }
                 } else {
-                    idxSplittedAttr = 0.0;
+                    if(val>=getThreshold()) {
+                        idxSplittedAttr = 1.0;
+                    } else {
+                        idxSplittedAttr = 0.0;
+                    }
                 }
             }
             return getChildren()[(int)idxSplittedAttr].distributionForInstance(instance);
