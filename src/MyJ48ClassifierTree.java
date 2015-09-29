@@ -207,12 +207,23 @@ public class MyJ48ClassifierTree {
             double idxSplittedAttr;
             if(getSplittedAttribute().isNominal()) {
                 idxSplittedAttr = instance.value(getSplittedAttribute());
+                if (Double.isNaN(idxSplittedAttr)) {
+                    Instances[] instancesSplitted = EntropyCalcUtil.splitDataByAttr(_data, getSplittedAttribute());
+                    int largestNumIdx = -1;
+                    int cnt = 0;
+                    for (int i = 0; i < instancesSplitted.length; ++i) {
+                        int tmp = instancesSplitted[i].numInstances();
+                        if (tmp > cnt) {
+                            largestNumIdx = i;
+                        }
+                    }
+                    idxSplittedAttr = largestNumIdx;
+                }
             }
             else {
                 if(instance.value(getSplittedAttribute())>=getThreshold()) {
                     idxSplittedAttr = 1.0;
-                }
-                else {
+                } else {
                     idxSplittedAttr = 0.0;
                 }
             }
