@@ -97,9 +97,8 @@ public class MyJ48ClassifierTree {
                 }
                 setChildren(new MyJ48ClassifierTree[numChildrenAndIndex]);
                 Instances[] instancesSplitted;
-                if(data.attribute(indexLargestGainRatio).isNumeric()) {
-                    Instances replacedMissingValues = new Instances(EntropyCalcUtil.replaceMissingValues(data, splittedAttribute));
-                    instancesSplitted = EntropyCalcUtil.splitDataByNumericAttr(replacedMissingValues, getSplittedAttribute(),threshold);
+                if(data.attribute(indexLargestGainRatio).isNumeric()) {                    
+                    instancesSplitted = EntropyCalcUtil.splitDataByNumericAttr(data, getSplittedAttribute(),threshold);
                 }
                 else {
                     instancesSplitted = EntropyCalcUtil.splitDataByAttr(data, getSplittedAttribute());
@@ -168,7 +167,18 @@ public class MyJ48ClassifierTree {
     public double classifyInstance(Instance instance) {
         //jika rekursif
         if (getDecisionIndex() == null && getSplittedAttribute() != null) {
-            double idxSplittedAttr = instance.value(getSplittedAttribute());
+            double idxSplittedAttr;
+            if(getSplittedAttribute().isNominal()) {
+                idxSplittedAttr = instance.value(getSplittedAttribute());
+            }
+            else {
+                if(instance.value(getSplittedAttribute())>=getThreshold()) {
+                    idxSplittedAttr=1.0;
+                }
+                else {
+                    idxSplittedAttr=0.0;
+                }
+            }
             return getChildren()[(int)idxSplittedAttr].classifyInstance(instance);
         } else return getDecisionIndex();
     }
@@ -194,7 +204,18 @@ public class MyJ48ClassifierTree {
 
     public double[] distributionForInstance(Instance instance) {
         if (getClassDistribution() == null && getSplittedAttribute() != null) {
-            double idxSplittedAttr = instance.value(getSplittedAttribute());
+            double idxSplittedAttr;
+            if(getSplittedAttribute().isNominal()) {
+                idxSplittedAttr = instance.value(getSplittedAttribute());
+            }
+            else {
+                if(instance.value(getSplittedAttribute())>=getThreshold()) {
+                    idxSplittedAttr = 1.0;
+                }
+                else {
+                    idxSplittedAttr = 0.0;
+                }
+            }
             return getChildren()[(int)idxSplittedAttr].distributionForInstance(instance);
         } else return getClassDistribution();
     }
