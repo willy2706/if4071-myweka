@@ -10,8 +10,8 @@ import weka.core.converters.ConverterUtils.DataSource;
 
 public class Main {
     public final static String FOLDER = "dataset/";
-    public final static String TRAINDATASETJ48 = FOLDER + "iris.arff";
-    public final static String TESTDATASETJ48 = FOLDER + "test.iris.arff";
+    public final static String TRAINDATASETJ48 = FOLDER + "weather.nominal.arff";
+    public final static String TESTDATASETJ48 = FOLDER + "test.weather.nominal.arff";
     public static void main(String[] args) throws Exception {
         DataSource datasource = new DataSource(TRAINDATASETJ48);
         Instances trainInstances = datasource.getDataSet();
