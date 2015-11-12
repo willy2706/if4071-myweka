@@ -3,6 +3,7 @@
  */
 
 
+import classifier.j48.MyJ48;
 import weka.classifiers.Evaluation;
 import weka.classifiers.trees.J48;
 import weka.core.Instances;
