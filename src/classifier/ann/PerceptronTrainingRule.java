@@ -18,7 +18,6 @@ public class PerceptronTrainingRule extends SingleLayerPerceptron{
     
     public PerceptronTrainingRule(int numInstance) {
         super(numInstance);
-        setHiddenLayers("0");
     }
 
     @Override
