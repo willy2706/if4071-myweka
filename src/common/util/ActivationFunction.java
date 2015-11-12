@@ -8,9 +8,11 @@ public enum ActivationFunction {
 
     public double calculateOutput (double input) {
         if (this == ActivationFunction.SIGMOID) {
-
+            double penyebut = 1.0 + Math.exp(-input);
+            double pembilang = 1.0;
+            return pembilang/penyebut;
         } else if (this == ActivationFunction.SIGN){
-
+            
         } else if (this == ActivationFunction.STEP) {
 
         }
