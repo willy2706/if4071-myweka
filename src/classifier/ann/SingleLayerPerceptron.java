@@ -1,15 +1,20 @@
 package classifier.ann;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Created by nim_13512065 on 11/11/15.
  */
 public abstract class SingleLayerPerceptron extends MyANN {
-    List<Double> input;
-    List<Double> weight;
-
-    //enum activation function??
+    private List<Double> input;
+    private List<Double> weight;
+    
+    public SingleLayerPerceptron(int numInstance) {
+        input = new ArrayList<Double>(numInstance);
+        weight = new ArrayList<Double>(numInstance);
+    };
+    
     public List<Double> getInput() {
         return input;
     }
