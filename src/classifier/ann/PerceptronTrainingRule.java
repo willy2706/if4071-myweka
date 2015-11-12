@@ -8,7 +8,9 @@ import weka.core.Instances;
  * Created by nim_13512065 on 11/11/15.
  */
 public class PerceptronTrainingRule extends SingleLayerPerceptron{
-    public PerceptronTrainingRule() {
+    
+    public PerceptronTrainingRule(int numInstance) {
+        super(numInstance);
         setHiddenLayers("0");
     }
 
