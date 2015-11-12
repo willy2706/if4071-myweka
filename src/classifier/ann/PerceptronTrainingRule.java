@@ -8,6 +8,13 @@ import weka.core.Instances;
  * Created by nim_13512065 on 11/11/15.
  */
 public class PerceptronTrainingRule extends SingleLayerPerceptron{
+    private double learningRate;
+    private double maxIterate;
+    private double deltaMSE;
+    private double momentum;
+    private String initialWeight; //random or given
+    private String activationFunction;
+    
     
     public PerceptronTrainingRule(int numInstance) {
         super(numInstance);
