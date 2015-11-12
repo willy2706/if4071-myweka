@@ -1,7 +1,9 @@
+package classifier.j48;
+
 import common.util.EntropyCalcUtil;
-import java.util.ArrayList;
+
 import java.util.Enumeration;
-import java.util.List;
+
 import weka.core.Attribute;
 import weka.core.Instance;
 import weka.core.Instances;

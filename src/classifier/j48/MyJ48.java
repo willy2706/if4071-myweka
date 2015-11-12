@@ -1,3 +1,6 @@
+
+package classifier.j48;
+
 import java.util.Enumeration;
 import weka.classifiers.Classifier;
 import weka.core.Attribute;
