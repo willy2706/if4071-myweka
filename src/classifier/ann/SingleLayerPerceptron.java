@@ -8,19 +8,28 @@ import java.util.List;
 /**
  * Created by nim_13512065 on 11/11/15.
  */
-public abstract class SingleLayerPerceptron extends MyANN {
+
+public class SingleLayerPerceptron {
+    protected List<InputValue> weight;
     protected double learningRate;
     protected int maxIterate;
     protected double deltaMSE;
     protected double momentum;
     protected Double initialWeight; //random or given
+    protected ActivationFunction activationFunction;
+
 
     public SingleLayerPerceptron() {
+        weight = new ArrayList<InputValue>();
+    };
+
+    public List<InputValue> getWeight() {
+        return weight;
     }
 
     public SingleLayerPerceptron(int numInstance) {
         initialWeight = Math.random(); //dari 0-1
-    };
+    }
 
     public double getLearningRate() {
         return learningRate;

@@ -5,20 +5,23 @@ import weka.core.Instance;
 import weka.core.Instances;
 import weka.core.Utils;
 
+import java.util.List;
+
 /**
  * Created by nim_13512065 on 11/13/15.
  */
-public class DeltaBatchRule extends SingleLayerPerceptron {
-
+public class DeltaBatchRule extends MyANN {
+    private List<InputValue> weight;
+    private double learningRate;
+    private int maxIterate;
+    private double deltaMSE;
+    private double momentum;
+    private Double initialWeight; //random or given
     private Double[] weights;
 
     public DeltaBatchRule() {
         super();
-     }
-
-    public DeltaBatchRule(int numInstance) {
-        super(numInstance);
-     }
+    }
 
     private void initialWeight(int num) {
         setWeights(new Double[num]);
@@ -82,5 +85,53 @@ public class DeltaBatchRule extends SingleLayerPerceptron {
 
     public void setWeights(Double[] weights) {
         this.weights = weights;
+    }
+
+    public List<InputValue> getWeight() {
+        return weight;
+    }
+
+    public void setWeight(List<InputValue> weight) {
+        this.weight = weight;
+    }
+
+    public double getLearningRate() {
+        return learningRate;
+    }
+
+    public void setLearningRate(double learningRate) {
+        this.learningRate = learningRate;
+    }
+
+    public int getMaxIterate() {
+        return maxIterate;
+    }
+
+    public void setMaxIterate(int maxIterate) {
+        this.maxIterate = maxIterate;
+    }
+
+    public double getDeltaMSE() {
+        return deltaMSE;
+    }
+
+    public void setDeltaMSE(double deltaMSE) {
+        this.deltaMSE = deltaMSE;
+    }
+
+    public double getMomentum() {
+        return momentum;
+    }
+
+    public void setMomentum(double momentum) {
+        this.momentum = momentum;
+    }
+
+    public Double getInitialWeight() {
+        return initialWeight;
+    }
+
+    public void setInitialWeight(Double initialWeight) {
+        this.initialWeight = initialWeight;
     }
 }
