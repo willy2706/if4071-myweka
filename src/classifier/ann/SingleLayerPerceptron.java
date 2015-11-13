@@ -8,7 +8,6 @@ import java.util.List;
 /**
  * Created by nim_13512065 on 11/11/15.
  */
-
 public class SingleLayerPerceptron {
     protected List<InputValue> weight;
     protected double learningRate;
@@ -20,8 +19,8 @@ public class SingleLayerPerceptron {
 
 
     public SingleLayerPerceptron() {
-        weight = new ArrayList<InputValue>();
-    };
+        
+    }
 
     public List<InputValue> getWeight() {
         return weight;

@@ -12,7 +12,8 @@ public enum ActivationFunction {
             double pembilang = 1.0;
             return pembilang/penyebut;
         } else if (this == ActivationFunction.SIGN){
-
+            if(input < 0) return -1;
+            else return 1;
         } else if (this == ActivationFunction.STEP) {
 
         }
