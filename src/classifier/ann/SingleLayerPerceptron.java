@@ -9,25 +9,16 @@ import java.util.List;
  * Created by nim_13512065 on 11/11/15.
  */
 public class SingleLayerPerceptron{
-    protected List<InputValue> weight;
     protected double learningRate;
-    protected double maxIterate;
+    protected int maxIterate;
     protected double deltaMSE;
     protected double momentum;
     protected String initialWeight; //random or given
     protected ActivationFunction activationFunction;
 
     public SingleLayerPerceptron() {
-        weight = new ArrayList<InputValue>();
+        
     };
-
-    public List<InputValue> getWeight() {
-        return weight;
-    }
-
-    public void setWeight(List<InputValue> weight) {
-        this.weight = weight;
-    }
 
     public double getLearningRate() {
         return learningRate;
@@ -37,11 +28,11 @@ public class SingleLayerPerceptron{
         this.learningRate = learningRate;
     }
 
-    public double getMaxIterate() {
+    public int getMaxIterate() {
         return maxIterate;
     }
 
-    public void setMaxIterate(double maxIterate) {
+    public void setMaxIterate(int maxIterate) {
         this.maxIterate = maxIterate;
     }
 
