@@ -9,6 +9,10 @@ public class InputValue {
     private List<double[]> input;
     private List<Double> weight;
 
+    public InputValue() {
+
+    }
+
     public List<double[]> getInput() {
         return input;
     }
@@ -24,6 +28,4 @@ public class InputValue {
     public void addWeight(List<Double> weight) {
         this.weight.addAll(weight);
     }
-    
-    
 }

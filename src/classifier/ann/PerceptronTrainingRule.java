@@ -25,7 +25,7 @@ public class PerceptronTrainingRule extends MyANN{
     public void setNumAttributes(int numAttributes) {
         this.numAttributes = numAttributes;
     }
-    
+
     public PerceptronTrainingRule(){
         perceptron = new SingleLayerPerceptron();
     }
