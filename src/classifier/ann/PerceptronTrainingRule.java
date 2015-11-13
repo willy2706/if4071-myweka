@@ -16,6 +16,7 @@ public class PerceptronTrainingRule extends MyANN{
     private int numAttributes;
     private double[] weights;
     private List<double[]> inputs; //matrix input
+    private ActivationFunction af= ActivationFunction.SIGN;
 
     public int getNumAttributes() {
         return numAttributes;
@@ -41,13 +42,13 @@ public class PerceptronTrainingRule extends MyANN{
         
         //change input to matrix
         inputs = new ArrayList<>();
-        double[] outputs = new double[data.numInstances()+1];
+        double[] targets = new double[data.numInstances()+1];
         Enumeration instanceIterator = data.enumerateInstances();
         int it=0;
         int classIndex = data.classIndex();
         while(instanceIterator.hasMoreElements()) {
             Instance instance = (Instance) instanceIterator.nextElement();
-            outputs[it] = instance.classValue();
+            targets[it] = instance.classValue();
             double[] input = new double[numAttributes];
             for(int i=0;i<numAttributes;++i) {
                 input[i] = instance.value(i);
@@ -59,27 +60,29 @@ public class PerceptronTrainingRule extends MyANN{
         //training
         for(int i=0;i<perceptron.getMaxIterate();++i) {
             for(int j=0;j<inputs.size();++j) {
-                double output = calculateOutput(inputs.get(j));
-                output = activate(output);
+                double output = calculateSum(inputs.get(j));
+                output = af.calculateOutput(output);
+                for(int k=0;k<inputs.get(j).length;k++) {
+                    updateWeight(targets[j],output,inputs.get(j)[k]);
+                }
             }
         }
     }
     
-    public double activate(double input) {
-        if(input >=0) {
-            return 1;
-        }
-        else {
-            return 0;
-        }
-    }
-    
-    public double calculateOutput(double[] inputs) {
+    public double calculateSum(double[] inputs) {
         double out = 0.0;
         for(int i=0;i<inputs.length+1;++i) {
             out+= inputs[i] * weights[i];
         }
         return out;
+    }
+    
+    private void updateWeight(double target, double output, double input) {
+        double[] newWeight = new double[numAttributes+1];
+        for(int i=0;i<inputs.size();i++) {
+            newWeight[i] = weights[i]+ perceptron.getLearningRate()*(target-output)*input;
+        }
+        weights = newWeight;
     }
 
     @Override
