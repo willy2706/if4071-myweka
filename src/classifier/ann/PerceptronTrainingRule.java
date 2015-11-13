@@ -1,6 +1,9 @@
 package classifier.ann;
 
 import common.util.ActivationFunction;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.List;
 import weka.core.Capabilities;
 import weka.core.Instance;
 import weka.core.Instances;
@@ -11,7 +14,8 @@ import weka.core.Instances;
 public class PerceptronTrainingRule extends MyANN{
     private SingleLayerPerceptron perceptron;
     private int numAttributes;
-    private int numInstances;
+    private double[] weights;
+    private List<double[]> inputs; //matrix input
 
     public int getNumAttributes() {
         return numAttributes;
@@ -20,14 +24,6 @@ public class PerceptronTrainingRule extends MyANN{
     public void setNumAttributes(int numAttributes) {
         this.numAttributes = numAttributes;
     }
-
-    public int getNumInstances() {
-        return numInstances;
-    }
-
-    public void setNumInstances(int numInstances) {
-        this.numInstances = numInstances;
-    }
     
     public PerceptronTrainingRule(){
         perceptron = new SingleLayerPerceptron();
@@ -35,8 +31,55 @@ public class PerceptronTrainingRule extends MyANN{
 
     @Override
     public void buildClassifier(Instances data) {
-        numInstances = data.numInstances();
         numAttributes = data.numAttributes();
+        
+        //initialize weight
+        weights = new double[numAttributes+1];
+        for(int i=0;i<numAttributes;++i) {
+            weights[i] = 0;
+        }
+        
+        //change input to matrix
+        inputs = new ArrayList<>();
+        double[] outputs = new double[data.numInstances()+1];
+        Enumeration instanceIterator = data.enumerateInstances();
+        int it=0;
+        int classIndex = data.classIndex();
+        while(instanceIterator.hasMoreElements()) {
+            Instance instance = (Instance) instanceIterator.nextElement();
+            outputs[it] = instance.classValue();
+            double[] input = new double[numAttributes];
+            for(int i=0;i<numAttributes;++i) {
+                input[i] = instance.value(i);
+            }
+            inputs.add(input);
+            it++;
+        }
+        
+        //training
+        for(int i=0;i<perceptron.getMaxIterate();++i) {
+            for(int j=0;j<inputs.size();++j) {
+                double output = calculateOutput(inputs.get(j));
+                output = activate(output);
+            }
+        }
+    }
+    
+    public double activate(double input) {
+        if(input >=0) {
+            return 1;
+        }
+        else {
+            return 0;
+        }
+    }
+    
+    public double calculateOutput(double[] inputs) {
+        double out = 0.0;
+        for(int i=0;i<inputs.length+1;++i) {
+            out+= inputs[i] * weights[i];
+        }
+        return out;
     }
 
     @Override
