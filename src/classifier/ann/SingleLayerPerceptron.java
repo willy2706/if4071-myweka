@@ -14,7 +14,6 @@ public class SingleLayerPerceptron{
     protected double deltaMSE;
     protected double momentum;
     protected String initialWeight; //random or given
-    protected ActivationFunction activationFunction;
 
     public SingleLayerPerceptron() {
         
@@ -50,14 +49,6 @@ public class SingleLayerPerceptron{
 
     public void setMomentum(double momentum) {
         this.momentum = momentum;
-    }
-
-    public ActivationFunction getActivationFunction() {
-        return activationFunction;
-    }
-
-    public void setActivationFunction(ActivationFunction activationFunction) {
-        this.activationFunction = activationFunction;
     }
     
     public String getInitialWeight() {
