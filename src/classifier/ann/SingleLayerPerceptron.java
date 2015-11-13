@@ -9,25 +9,18 @@ import java.util.List;
  * Created by nim_13512065 on 11/11/15.
  */
 public abstract class SingleLayerPerceptron extends MyANN {
-    protected List<InputValue> weight;
     protected double learningRate;
-    protected double maxIterate;
+    protected int maxIterate;
     protected double deltaMSE;
     protected double momentum;
-//    protected String initialWeight; //random or given
-    protected ActivationFunction activationFunction;
+    protected Double initialWeight; //random or given
+
+    public SingleLayerPerceptron() {
+    }
 
     public SingleLayerPerceptron(int numInstance) {
-        setWeight(new ArrayList<InputValue>(numInstance));
+        initialWeight = Math.random(); //dari 0-1
     };
-
-    public List<InputValue> getWeight() {
-        return weight;
-    }
-
-    public void setWeight(List<InputValue> weight) {
-        this.weight = weight;
-    }
 
     public double getLearningRate() {
         return learningRate;
@@ -37,11 +30,11 @@ public abstract class SingleLayerPerceptron extends MyANN {
         this.learningRate = learningRate;
     }
 
-    public double getMaxIterate() {
+    public int getMaxIterate() {
         return maxIterate;
     }
 
-    public void setMaxIterate(double maxIterate) {
+    public void setMaxIterate(int maxIterate) {
         this.maxIterate = maxIterate;
     }
 
@@ -61,11 +54,12 @@ public abstract class SingleLayerPerceptron extends MyANN {
         this.momentum = momentum;
     }
 
-    public ActivationFunction getActivationFunction() {
-        return activationFunction;
+
+    public Double getInitialWeight() {
+        return initialWeight;
     }
 
-    public void setActivationFunction(ActivationFunction activationFunction) {
-        this.activationFunction = activationFunction;
+    public void setInitialWeight(Double initialWeight) {
+        this.initialWeight = initialWeight;
     }
 }

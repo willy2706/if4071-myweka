@@ -3,6 +3,7 @@
  */
 
 
+import classifier.ann.DeltaBatchRule;
 import classifier.j48.MyJ48;
 import weka.classifiers.Evaluation;
 import weka.classifiers.trees.J48;
@@ -21,30 +22,26 @@ public class Main {
         Evaluation wekaEvaluation = new Evaluation(trainInstances);
 
 
-//        /*sample*/
-        J48 classifier = new J48();
-//        classifier.buildClassifier(trainInstances);
-//        evaluation.evaluateModel(classifier, trainInstances);
-
-
         /*what we will use*/
-        MyJ48 myJ48 = new MyJ48();
-        myJ48.buildClassifier(trainInstances);
+        DeltaBatchRule deltaBatchRule = new DeltaBatchRule();
+        deltaBatchRule.setInitialWeight(1.0);
+        deltaBatchRule.setMaxIterate(10);
+        deltaBatchRule.buildClassifier(trainInstances);;
         datasource = new DataSource(TESTDATASETJ48);
         Instances testInstances = datasource.getDataSet();
         testInstances.setClassIndex(testInstances.numAttributes()-1);
-        evaluation.evaluateModel(myJ48, testInstances);
+        evaluation.evaluateModel(deltaBatchRule, testInstances);
         System.out.print(evaluation.toMatrixString());
         System.out.println(evaluation.toSummaryString());
         
         // dari WEKA
-        J48 j48 = new J48();
-        j48.buildClassifier(trainInstances);
-        DataSource wekadatasource = new DataSource(TESTDATASETJ48);
-        Instances wekaTestInstances = wekadatasource.getDataSet();
-        wekaTestInstances.setClassIndex(wekaTestInstances.numAttributes()-1);
-        wekaEvaluation.evaluateModel(j48, wekaTestInstances);
-        System.out.print(evaluation.toMatrixString());
-        System.out.println(evaluation.toSummaryString());
+//        J48 j48 = new J48();
+//        j48.buildClassifier(trainInstances);
+//        DataSource wekadatasource = new DataSource(TESTDATASETJ48);
+//        Instances wekaTestInstances = wekadatasource.getDataSet();
+//        wekaTestInstances.setClassIndex(wekaTestInstances.numAttributes()-1);
+//        wekaEvaluation.evaluateModel(j48, wekaTestInstances);
+//        System.out.print(evaluation.toMatrixString());
+//        System.out.println(evaluation.toSummaryString());
     }
 }
