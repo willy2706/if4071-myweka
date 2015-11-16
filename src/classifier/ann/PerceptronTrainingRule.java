@@ -7,6 +7,7 @@ import java.util.List;
 import weka.core.Capabilities;
 import weka.core.Instance;
 import weka.core.Instances;
+import weka.core.matrix.Maths;
 
 /**
  * Created by nim_13512065 on 11/11/15.
@@ -83,6 +84,23 @@ public class PerceptronTrainingRule extends MyANN{
             newWeight[i] = weights[i]+ perceptron.getLearningRate()*(target-output)*input;
         }
         weights = newWeight;
+    }
+    
+    private double meanSquareErrorEvaluation(List<double[]> instancesInput, double[] target){
+        double[] predicted = new double[instancesInput.size()];
+        // Calculate prediction
+        for(int i=0; i<instancesInput.size(); i++){
+            predicted[i] = calculateSum(instancesInput.get(i));
+            predicted[i] = af.calculateOutput(predicted[i]);
+        }
+        // Calculate error
+        double mse =0.0;
+        for(int i=0; i<instancesInput.size(); i++){
+            mse += Maths.square(target[i] - predicted[i]);
+        }
+        mse /= instancesInput.size();
+
+        return mse;
     }
 
     @Override
