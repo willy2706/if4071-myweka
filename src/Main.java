@@ -3,10 +3,8 @@
  */
 
 
-import classifier.ann.DeltaBatchRule;
-import classifier.j48.MyJ48;
+import classifier.ann.DeltaRulePerceptron;
 import weka.classifiers.Evaluation;
-import weka.classifiers.trees.J48;
 import weka.core.Instances;
 import weka.core.converters.ConverterUtils.DataSource;
 
@@ -23,17 +21,30 @@ public class Main {
 
 
         /*what we will use*/
-        DeltaBatchRule deltaBatchRule = new DeltaBatchRule();
-        deltaBatchRule.setInitialWeight(1.0);
-        deltaBatchRule.setMaxIterate(10);
-        deltaBatchRule.buildClassifier(trainInstances);;
-        datasource = new DataSource(TESTDATASETJ48);
+//        DeltaBatchRule deltaBatchRule = new DeltaBatchRule();
+//        deltaBatchRule.setInitialWeight(1.0);
+//        deltaBatchRule.setMaxIterate(10);
+//        deltaBatchRule.buildClassifier(trainInstances);;
+//        datasource = new DataSource(TESTDATASETJ48);
+//        Instances testInstances = datasource.getDataSet();
+//        testInstances.setClassIndex(testInstances.numAttributes()-1);
+//        evaluation.evaluateModel(deltaBatchRule, testInstances);
+//        System.out.print(evaluation.toMatrixString());
+//        System.out.println(evaluation.toSummaryString());
+
+        DeltaRulePerceptron deltaRulePerceptron = new DeltaRulePerceptron();
+        deltaRulePerceptron.setMomentum(0.001);
+        deltaRulePerceptron.setMaxIteration(100);
+        deltaRulePerceptron.setLearningRate(0.01);
+        deltaRulePerceptron.setTerminationDeltaMSE(1e-10);
+        deltaRulePerceptron.buildClassifier(trainInstances);
+        datasource = new DataSource(TRAINDATASETJ48);
         Instances testInstances = datasource.getDataSet();
         testInstances.setClassIndex(testInstances.numAttributes()-1);
-        evaluation.evaluateModel(deltaBatchRule, testInstances);
+        evaluation.evaluateModel(deltaRulePerceptron, testInstances);
         System.out.print(evaluation.toMatrixString());
         System.out.println(evaluation.toSummaryString());
-        
+
         // dari WEKA
 //        J48 j48 = new J48();
 //        j48.buildClassifier(trainInstances);

@@ -13,7 +13,7 @@ import java.util.Random;
 
 public class DeltaRulePerceptron extends Classifier {
     private int _nPredictor;
-    private double[] _weights;
+    private double[] _initialWeights;
     private double _learningRate;
     private int _maxIteration;
     private double _momentum;
@@ -23,7 +23,8 @@ public class DeltaRulePerceptron extends Classifier {
     private NominalToBinary _nominalToBinary;
 
     private int _nIterationDone;
-    private List<double[]> _updatedWeights;
+    private double[] _prevWeight;
+    private double[] _lastWeight;
 
     public DeltaRulePerceptron() {
 
@@ -61,7 +62,7 @@ public class DeltaRulePerceptron extends Classifier {
             _predictorList.add(attr);
         }
 
-        double[][] inputs = new double[numericInstances.numInstances()][_weights.length];
+        double[][] inputs = new double[numericInstances.numInstances()][_initialWeights.length];
         double[] outputs = new double[numericInstances.numInstances()];
 
         for (int instIndex = 0; instIndex < numericInstances.numInstances(); instIndex++) {
@@ -74,48 +75,46 @@ public class DeltaRulePerceptron extends Classifier {
         }
 
         // Training Delta Rule Perceptron
-        _nIterationDone = 0;
-        _updatedWeights = new ArrayList<>();
-        // updated weights index 0 is initial weight
-        _updatedWeights.add(_weights);
+        _prevWeight = null;
+        _lastWeight = _initialWeights;
         double prevMse = meanSquareErrorEvaluation(inputs, outputs);
-        for (int it = 0; it < _maxIteration; it++) {
+        for (int it = 0; it <= _maxIteration; it++) {
 
             for (int instIndex = 0; instIndex < inputs.length; instIndex++) {
 
                 // Update weight
                 double predicted = calculateOutput(inputs[instIndex]);
-                double[] newWeight = new double[_weights.length];
+                double[] newWeight = new double[_initialWeights.length];
                 for (int i = 0; i < newWeight.length; i++) {
                     double prevDeltaWeight;
-                    if (_nIterationDone > 0) {
-                        prevDeltaWeight = _updatedWeights.get(_nIterationDone)[i] - _updatedWeights.get(_nIterationDone - 1)[i];
+                    if (it > 0 || instIndex > 0) {
+                        prevDeltaWeight = _lastWeight[i] - _prevWeight[i];
                     } else {
                         prevDeltaWeight = 0;
                     }
                     double deltaWeight = _learningRate * (outputs[instIndex] - predicted) * inputs[instIndex][i]
                             + (_momentum * prevDeltaWeight);
-                    newWeight[i] += deltaWeight;
+                    newWeight[i] = _lastWeight[i] + deltaWeight;
                 }
 
                 // Store update
-                _nIterationDone++;
-                _updatedWeights.add(newWeight);
-
-                double mseEvaluation = meanSquareErrorEvaluation(inputs, outputs);
+                _prevWeight = _lastWeight;
+                _lastWeight = newWeight;
             }
 
+            _nIterationDone = it;
             double mseEvaluation = meanSquareErrorEvaluation(inputs, outputs);
-            System.out.println("Delta MSE: " + (prevMse - mseEvaluation) +" "+ _terminationDeltaMSE);
+            System.out.println("Epoch " + _nIterationDone + " MSE: " + mseEvaluation);
+            System.out.println("Epoch " + _nIterationDone + " Delta MSE: " + (prevMse - mseEvaluation) + " " + _terminationDeltaMSE);
             if (Math.abs(prevMse - mseEvaluation) < _terminationDeltaMSE) break;
             prevMse = mseEvaluation;
 
             // Output weight for each epoch
-            System.out.print(_nIterationDone + " | ");
-            for (int i = 0; i < _weights.length; i++) {
-                System.out.print("" + i + ":" + _updatedWeights.get(_nIterationDone)[i] + " ");
+            System.out.print("Epoch " + _nIterationDone + " Weight: ");
+            for (int i = 0; i < _initialWeights.length; i++) {
+                System.out.print("" + i + ")" + _lastWeight[i] + " ");
             }
-            System.out.printf("\n");
+            System.out.println();
 
         }
     }
@@ -129,7 +128,7 @@ public class DeltaRulePerceptron extends Classifier {
 
         _nominalToBinary.input(instance);
         Instance numericInstance = _nominalToBinary.output();
-        double[] input = new double[_weights.length];
+        double[] input = new double[_initialWeights.length];
         input[0] = 1.0;
         for (int i = 0; i < _predictorList.size(); i++) {
             input[i + 1] = numericInstance.value(_predictorList.get(i));
@@ -167,11 +166,11 @@ public class DeltaRulePerceptron extends Classifier {
     }
 
     public void setInitialWeight(double[] weights) {
-        _weights = weights;
+        _initialWeights = weights;
     }
 
     public double[] getWeights() {
-        return _weights;
+        return _initialWeights;
     }
 
     public double getTerminationDeltaMSE() {
@@ -201,7 +200,7 @@ public class DeltaRulePerceptron extends Classifier {
     private double calculateOutput(double[] input) {
         double output = 0.0;
         for (int i = 0; i < _nPredictor + 1; i++) {
-            output += (_updatedWeights.get(_nIterationDone)[i] * input[i]);
+            output += (_lastWeight[i] * input[i]);
         }
         return output;
     }
@@ -223,11 +222,11 @@ public class DeltaRulePerceptron extends Classifier {
     }
 
     private void initWeight() {
-        if (_weights == null || _weights.length != (_nPredictor + 1)) {
-            _weights = new double[_nPredictor + 1];
+        if (_initialWeights == null || _initialWeights.length != (_nPredictor + 1)) {
+            _initialWeights = new double[_nPredictor + 1];
             Random random = new Random();
             for (int i = 0; i < _nPredictor + 1; i++) {
-                _weights[i] = random.nextDouble();
+                _initialWeights[i] = random.nextDouble();
             }
         }
     }
