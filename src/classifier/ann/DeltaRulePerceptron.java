@@ -78,7 +78,7 @@ public class DeltaRulePerceptron extends Classifier {
         _prevWeight = null;
         _lastWeight = _initialWeights;
         double prevMse = meanSquareErrorEvaluation(inputs, outputs);
-        for (int it = 0; it <= _maxIteration; it++) {
+        for (int it = 0; it < _maxIteration; it++) {
 
             for (int instIndex = 0; instIndex < inputs.length; instIndex++) {
 
@@ -102,10 +102,10 @@ public class DeltaRulePerceptron extends Classifier {
                 _lastWeight = newWeight;
             }
 
-            _nIterationDone = it;
+            _nIterationDone = it + 1;
             double mseEvaluation = meanSquareErrorEvaluation(inputs, outputs);
             System.out.println("Epoch " + _nIterationDone + " MSE: " + mseEvaluation);
-            System.out.println("Epoch " + _nIterationDone + " Delta MSE: " + (prevMse - mseEvaluation) + " " + _terminationDeltaMSE);
+            System.out.println("Epoch " + _nIterationDone + " Delta MSE: " + (prevMse - mseEvaluation));
             if (Math.abs(prevMse - mseEvaluation) < _terminationDeltaMSE) break;
             prevMse = mseEvaluation;
 
