@@ -30,7 +30,7 @@ public class DeltaRulePerceptron extends Classifier {
         // Initialization with default value
         _learningRate = 0.1;
         _momentum = 0.0;
-        _terminationDeltaMSE = 0.001;
+        _terminationDeltaMSE = 1e-4;
         _maxIteration = 200;
     }
 
@@ -45,6 +45,7 @@ public class DeltaRulePerceptron extends Classifier {
 
         // change all attr to numeric
         _nominalToBinary = new NominalToBinary();
+        _nominalToBinary.setInputFormat(data);
         Instances numericInstances = Filter.useFilter(data, _nominalToBinary);
 
         _nPredictor = numericInstances.numAttributes() - 1;
@@ -93,29 +94,30 @@ public class DeltaRulePerceptron extends Classifier {
                         prevDeltaWeight = 0;
                     }
                     double deltaWeight = _learningRate * (outputs[instIndex] - predicted) * inputs[instIndex][i]
-                            + _momentum * prevDeltaWeight;
+                            + (_momentum * prevDeltaWeight);
                     newWeight[i] += deltaWeight;
                 }
 
                 // Store update
                 _nIterationDone++;
                 _updatedWeights.add(newWeight);
+
+                double mseEvaluation = meanSquareErrorEvaluation(inputs, outputs);
             }
 
             double mseEvaluation = meanSquareErrorEvaluation(inputs, outputs);
-            // TODO use absolut or not?
-            if ((prevMse - mseEvaluation) < _terminationDeltaMSE) break;
+            System.out.println("Delta MSE: " + (prevMse - mseEvaluation) +" "+ _terminationDeltaMSE);
+            if (Math.abs(prevMse - mseEvaluation) < _terminationDeltaMSE) break;
             prevMse = mseEvaluation;
 
             // Output weight for each epoch
-            // TODO use system.out or logging
+            System.out.print(_nIterationDone + " | ");
             for (int i = 0; i < _weights.length; i++) {
                 System.out.print("" + i + ":" + _updatedWeights.get(_nIterationDone)[i] + " ");
             }
             System.out.printf("\n");
 
         }
-
     }
 
     @Override
@@ -199,7 +201,7 @@ public class DeltaRulePerceptron extends Classifier {
     private double calculateOutput(double[] input) {
         double output = 0.0;
         for (int i = 0; i < _nPredictor + 1; i++) {
-            output += _updatedWeights.get(_nIterationDone)[i] * input[i];
+            output += (_updatedWeights.get(_nIterationDone)[i] * input[i]);
         }
         return output;
     }
@@ -213,7 +215,7 @@ public class DeltaRulePerceptron extends Classifier {
         // Calculate error
         double mse = 0.0;
         for (int i = 0; i < instancesInput.length; i++) {
-            mse += Maths.square(target[i] - predicted[i]);
+            mse = (Maths.square(target[i] - predicted[i]) - mse)/(i+1);
         }
         mse /= instancesInput.length;
 
@@ -221,11 +223,11 @@ public class DeltaRulePerceptron extends Classifier {
     }
 
     private void initWeight() {
-        if (_weights.length != (_nPredictor + 1)) {
+        if (_weights == null || _weights.length != (_nPredictor + 1)) {
             _weights = new double[_nPredictor + 1];
             Random random = new Random();
             for (int i = 0; i < _nPredictor + 1; i++) {
-                _weights[i] = (random.nextDouble() % 1000.0);
+                _weights[i] = random.nextDouble();
             }
         }
     }
