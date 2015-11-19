@@ -1,10 +1,7 @@
 package classifier.ann;
 
 import weka.classifiers.Classifier;
-import weka.core.Attribute;
-import weka.core.Capabilities;
-import weka.core.Instance;
-import weka.core.Instances;
+import weka.core.*;
 import weka.core.matrix.Maths;
 import weka.filters.Filter;
 import weka.filters.supervised.attribute.NominalToBinary;
@@ -15,8 +12,7 @@ import java.util.List;
 import java.util.Random;
 
 public class DeltaRulePerceptron extends Classifier {
-    // TODO handle binary and numeric
-    private int _nAttribute;
+    private int _nPredictor;
     private double[] _weights;
     private double _learningRate;
     private int _maxIteration;
@@ -26,7 +22,7 @@ public class DeltaRulePerceptron extends Classifier {
 
     private NominalToBinary _nominalToBinary;
 
-    private int _numIterationDone;
+    private int _nIterationDone;
     private List<double[]> _updatedWeights;
 
     public DeltaRulePerceptron() {
@@ -51,7 +47,7 @@ public class DeltaRulePerceptron extends Classifier {
         _nominalToBinary = new NominalToBinary();
         Instances numericInstances = Filter.useFilter(data, _nominalToBinary);
 
-        _nAttribute = numericInstances.numAttributes();
+        _nPredictor = numericInstances.numAttributes() - 1;
 
         // Initialize weight
         initWeight();
@@ -64,12 +60,11 @@ public class DeltaRulePerceptron extends Classifier {
             _predictorList.add(attr);
         }
 
-        double[][] inputs = new double[numericInstances.numInstances()][_nAttribute + 1];
+        double[][] inputs = new double[numericInstances.numInstances()][_weights.length];
         double[] outputs = new double[numericInstances.numInstances()];
 
         for (int instIndex = 0; instIndex < numericInstances.numInstances(); instIndex++) {
             Instance instance = numericInstances.instance(instIndex);
-            // TODO how about binary nominal value?
             outputs[instIndex] = instance.classValue();
             inputs[instIndex][0] = 1.0;
             for (int i = 0; i < _predictorList.size(); i++) {
@@ -78,7 +73,7 @@ public class DeltaRulePerceptron extends Classifier {
         }
 
         // Training Delta Rule Perceptron
-        _numIterationDone = 0;
+        _nIterationDone = 0;
         _updatedWeights = new ArrayList<>();
         // updated weights index 0 is initial weight
         _updatedWeights.add(_weights);
@@ -92,8 +87,8 @@ public class DeltaRulePerceptron extends Classifier {
                 double[] newWeight = new double[_weights.length];
                 for (int i = 0; i < newWeight.length; i++) {
                     double prevDeltaWeight;
-                    if (_numIterationDone > 0) {
-                        prevDeltaWeight = _updatedWeights.get(_numIterationDone)[i] - _updatedWeights.get(_numIterationDone - 1)[i];
+                    if (_nIterationDone > 0) {
+                        prevDeltaWeight = _updatedWeights.get(_nIterationDone)[i] - _updatedWeights.get(_nIterationDone - 1)[i];
                     } else {
                         prevDeltaWeight = 0;
                     }
@@ -103,17 +98,19 @@ public class DeltaRulePerceptron extends Classifier {
                 }
 
                 // Store update
-                _numIterationDone++;
+                _nIterationDone++;
                 _updatedWeights.add(newWeight);
             }
 
             double mseEvaluation = meanSquareErrorEvaluation(inputs, outputs);
+            // TODO use absolut or not?
             if ((prevMse - mseEvaluation) < _terminationDeltaMSE) break;
             prevMse = mseEvaluation;
 
             // Output weight for each epoch
+            // TODO use system.out or logging
             for (int i = 0; i < _weights.length; i++) {
-                System.out.print("" + i + ":" + _updatedWeights.get(_numIterationDone)[i] + " ");
+                System.out.print("" + i + ":" + _updatedWeights.get(_nIterationDone)[i] + " ");
             }
             System.out.printf("\n");
 
@@ -122,7 +119,12 @@ public class DeltaRulePerceptron extends Classifier {
     }
 
     @Override
-    public double[] distributionForInstance(Instance instance) {
+    public double[] distributionForInstance(Instance instance) throws Exception {
+
+        if (instance.hasMissingValue()) {
+            throw new NoSupportForMissingValuesException("DeltaRulePerceptron: cannot handle missing value");
+        }
+
         _nominalToBinary.input(instance);
         Instance numericInstance = _nominalToBinary.output();
         double[] input = new double[_weights.length];
@@ -134,8 +136,8 @@ public class DeltaRulePerceptron extends Classifier {
         if (numericInstance.classAttribute().isNumeric()) {
             return new double[]{prediction};
         } else if (numericInstance.classAttribute().isNominal()) {
-            if (prediction < 0) prediction = 0;
-            if (prediction > 1) prediction = 1;
+            if (prediction < 0.0) prediction = 0.0;
+            if (prediction > 1.0) prediction = 1.0;
             double class0 = 1.0 - prediction;
             double class1 = prediction;
             return new double[]{class0, class1};
@@ -196,8 +198,8 @@ public class DeltaRulePerceptron extends Classifier {
 
     private double calculateOutput(double[] input) {
         double output = 0.0;
-        for (int i = 0; i < _nAttribute + 1; i++) {
-            output += _updatedWeights.get(_numIterationDone)[i] * input[i];
+        for (int i = 0; i < _nPredictor + 1; i++) {
+            output += _updatedWeights.get(_nIterationDone)[i] * input[i];
         }
         return output;
     }
@@ -219,10 +221,10 @@ public class DeltaRulePerceptron extends Classifier {
     }
 
     private void initWeight() {
-        if (_weights.length != (_nAttribute + 1)) {
-            _weights = new double[_nAttribute + 1];
+        if (_weights.length != (_nPredictor + 1)) {
+            _weights = new double[_nPredictor + 1];
             Random random = new Random();
-            for (int i = 0; i < _nAttribute + 1; i++) {
+            for (int i = 0; i < _nPredictor + 1; i++) {
                 _weights[i] = (random.nextDouble() % 1000.0);
             }
         }
