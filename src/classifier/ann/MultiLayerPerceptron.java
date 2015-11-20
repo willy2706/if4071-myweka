@@ -92,7 +92,7 @@ public class MultiLayerPerceptron extends Classifier {
         }
 
         // Change input and output to matrix
-        _predictorList = new ArrayList<Attribute>();
+        _predictorList = new ArrayList<>();
         Enumeration attrIterator = numericInstances.enumerateAttributes();
         while (attrIterator.hasMoreElements()) {
             Attribute attr = (Attribute) attrIterator.nextElement();
@@ -130,9 +130,7 @@ public class MultiLayerPerceptron extends Classifier {
         for (int iter = 0; iter < _maxIteration; iter++) {
 
             for (int instIndex = 0; instIndex < inputs.length; instIndex++) {
-                // TODO backprop learning at this place
-                double[] predicted = calculateOutput(inputs[instIndex]);
-                backpropUpdate(predicted, outputs[instIndex]);
+                backpropUpdate(inputs[instIndex], outputs[instIndex]);
             }
 
             _nIterationDone = iter + 1;
@@ -274,7 +272,65 @@ public class MultiLayerPerceptron extends Classifier {
         return layerOutput;
     }
 
-    private void backpropUpdate(double[] predicted, double[] output) {
-        // TODO implement
+    private void backpropUpdate(double[] input, double[] output) {
+        recursiveBackprop(input, output, 0);
     }
+
+    private double[] recursiveBackprop(double[] layerInput, double[] target, int layer) {
+        // TODO add momentum, linear output
+        // Calculate output
+        double[] layerOutput = new double[_neuronPerLayer[layer]];
+        for (int neuronIdx = 0; neuronIdx < _neuronPerLayer[layer]; neuronIdx++) {
+            layerOutput[neuronIdx] = _neuralNetwork[layer][neuronIdx].calculateOutput(layerInput);
+        }
+
+        // Update error and recursive
+        if (layer == (_neuronPerLayer.length - 1)) { // Output layer
+            // Previous layer error
+            double[] prevLayerNeuronError = new double[layerInput.length];
+            for (int i = 0; i < prevLayerNeuronError.length; i++) prevLayerNeuronError[i] = 0.0;
+
+            for (int neuronIdx = 0; neuronIdx < _neuronPerLayer[layer]; neuronIdx++) {
+                double[] oldWeights = _neuralNetwork[layer][neuronIdx].getWeights();
+                double[] newWeights = new double[oldWeights.length];
+
+                double neuronError = layerOutput[neuronIdx] * (1 - layerOutput[neuronIdx]) *
+                        (target[neuronIdx] - layerOutput[neuronIdx]);
+
+                newWeights[0] = oldWeights[0] + _learningRate * neuronError * 1; // intercept
+                for (int i = 0; i < layerInput.length; i++) {
+                    newWeights[i + 1] = oldWeights[i + 1] + _learningRate * neuronError * layerInput[i];
+                    prevLayerNeuronError[i] += oldWeights[i + 1] * neuronError;
+                }
+                _neuralNetwork[layer][neuronIdx].setWeights(newWeights);
+            }
+
+            // Return prev layer error
+            return prevLayerNeuronError;
+
+        } else {
+            double[] eachNeuronError = recursiveBackprop(layerOutput, target, layer + 1);
+            // Previous layer error
+            double[] prevLayerNeuronError = new double[layerInput.length];
+            for (int i = 0; i < prevLayerNeuronError.length; i++) prevLayerNeuronError[i] = 0.0;
+
+            for (int neuronIdx = 0; neuronIdx < _neuronPerLayer[layer]; neuronIdx++) {
+                double[] oldWeights = _neuralNetwork[layer][neuronIdx].getWeights();
+                double[] newWeights = new double[oldWeights.length];
+
+                double neuronError = layerOutput[neuronIdx] * (1 - layerOutput[neuronIdx]) * eachNeuronError[neuronIdx];
+
+                newWeights[0] = oldWeights[0] + _learningRate * neuronError * 1; // intercept
+                for (int i = 0; i < layerInput.length; i++) {
+                    newWeights[i + 1] = oldWeights[i + 1] + _learningRate * neuronError * layerInput[i];
+                    prevLayerNeuronError[i] += oldWeights[i + 1] * neuronError;
+                }
+                _neuralNetwork[layer][neuronIdx].setWeights(newWeights);
+            }
+
+            // Return prev layer error
+            return prevLayerNeuronError;
+        }
+    }
+
 }
