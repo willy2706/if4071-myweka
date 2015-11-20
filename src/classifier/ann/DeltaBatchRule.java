@@ -1,137 +1,103 @@
 package classifier.ann;
 
-import weka.core.Capabilities;
-import weka.core.Instance;
-import weka.core.Instances;
-import weka.core.Utils;
+import weka.core.*;
+import weka.filters.Filter;
+import weka.filters.supervised.attribute.NominalToBinary;
 
+import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.List;
 
 /**
  * Created by nim_13512065 on 11/13/15.
  */
-public class DeltaBatchRule extends MyANN {
-    private List<InputValue> weight;
-    private double learningRate;
-    private int maxIterate;
-    private double deltaMSE;
-    private double momentum;
-    private Double initialWeight; //random or given
-    private Double[] weights;
+public class DeltaBatchRule extends DeltaRulePerceptron {
 
     public DeltaBatchRule() {
         super();
     }
 
-    private void initialWeight(int num) {
-        setWeights(new Double[num]);
-        for (int i = 0; i < num; ++i) {
-            getWeights()[i] = getInitialWeight();
-        }
-    }
-
-    private double calculateSumProduct(int cnt, double[] inputs) {
-        double ret = 0.0;
-        for (int i = 0; i < cnt; ++i) {
-            ret+=inputs[i] * getWeights()[i];
-        }
-        return ret;
-    }
-
-    private double[] getInput(Instance instance) {
-        double[] inputs = new double[instance.numAttributes()];
-        for (int j = 0; j < instance.numAttributes(); ++j) {
-            inputs[j] = instance.value(j);
-        }
-        return inputs;
-    }
-
     @Override
-    public void buildClassifier(Instances data) {
-        initialWeight(data.numAttributes());
-        int it = 1;
-        double err = Double.MAX_VALUE;
-        while (Utils.smOrEq(it,getMaxIterate()) && Utils.gr(err,getDeltaMSE())) {
-            for (int i = 0; i < data.numInstances(); ++i) {
-                Instance row = data.instance(i);
-                double[] inputs = getInput(row);
-                double y = calculateSumProduct(data.numAttributes(), inputs);
-                //TODO hitung MSE
+    public void buildClassifier(Instances data) throws Exception {
+        // can classifier handle the data?
+        getCapabilities().testWithFail(data);
+
+        // remove instances with missing class
+        data = new Instances(data);
+        data.deleteWithMissingClass();
+
+        // change all attr to numeric
+        _nominalToBinary = new NominalToBinary();
+        _nominalToBinary.setInputFormat(data);
+        Instances numericInstances = Filter.useFilter(data, _nominalToBinary);
+
+        _nPredictor = numericInstances.numAttributes() - 1;
+
+        // Initialize weight
+        initWeight();
+
+        // Change input to matrix
+        _predictorList = new ArrayList<Attribute>();
+        Enumeration attrIterator = numericInstances.enumerateAttributes();
+        while (attrIterator.hasMoreElements()) {
+            Attribute attr = (Attribute) attrIterator.nextElement();
+            _predictorList.add(attr);
+        }
+
+        double[][] inputs = new double[numericInstances.numInstances()][_initialWeights.length];
+        double[] outputs = new double[numericInstances.numInstances()];
+
+        for (int instIndex = 0; instIndex < numericInstances.numInstances(); instIndex++) {
+            Instance instance = numericInstances.instance(instIndex);
+            outputs[instIndex] = instance.classValue();
+            inputs[instIndex][0] = 1.0;
+            for (int i = 0; i < _predictorList.size(); i++) {
+                inputs[instIndex][i + 1] = instance.value(_predictorList.get(i));
             }
-//            jangan lupa set deltamse
-//            setDeltaMSE();
-            ++it;
         }
-    }
 
-    @Override
-    public double[] distributionForInstance(Instance instance) {
-        return new double[0];
-    }
+        // Training Delta Rule Perceptron
+        _prevWeight = null;
+        _lastWeight = _initialWeights;
+        double prevMse = meanSquareErrorEvaluation(inputs, outputs);
+        for (int it = 0; it < _maxIteration; it++) {
 
-    @Override
-    public double classifyInstance(Instance instance) {
-        return 0;
-    }
+            double[] newWeight = new double[_initialWeights.length];
+            for (int instIndex = 0; instIndex < inputs.length; instIndex++) {
 
-    @Override
-    public Capabilities getCapabilities() {
-        return null;
-    }
+                // Update weight
+                double predicted = calculateOutput(inputs[instIndex]);
+                for (int i = 0; i < newWeight.length; i++) {
+                    double prevDeltaWeight;
+                    if (it > 0 || instIndex > 0) {
+                        prevDeltaWeight = _lastWeight[i] - _prevWeight[i];
+                    } else {
+                        prevDeltaWeight = 0;
+                    }
+                    double deltaWeight = _learningRate * (outputs[instIndex] - predicted) * inputs[instIndex][i]
+                            + (_momentum * prevDeltaWeight);
+                    newWeight[i] = _lastWeight[i] + deltaWeight;
+                }
 
-    public Double[] getWeights() {
-        return weights;
-    }
+            }
+            // Store update
+            _prevWeight = _lastWeight;
+            _lastWeight = newWeight;
 
-    public void setWeights(Double[] weights) {
-        this.weights = weights;
-    }
+            _nIterationDone = it + 1;
+            double mseEvaluation = meanSquareErrorEvaluation(inputs, outputs);
+            System.out.println("Epoch " + _nIterationDone + " MSE: " + mseEvaluation);
+            System.out.println("Epoch " + _nIterationDone + " Delta MSE: " + (prevMse - mseEvaluation));
+            if (Math.abs(prevMse - mseEvaluation) < _terminationDeltaMSE) break;
+            prevMse = mseEvaluation;
 
-    public List<InputValue> getWeight() {
-        return weight;
-    }
+            // Output weight for each epoch
+            System.out.print("Epoch " + _nIterationDone + " Weight: ");
+            for (int i = 0; i < _initialWeights.length; i++) {
+                System.out.print("" + i + ")" + _lastWeight[i] + " ");
+            }
+            System.out.println();
 
-    public void setWeight(List<InputValue> weight) {
-        this.weight = weight;
-    }
-
-    public double getLearningRate() {
-        return learningRate;
-    }
-
-    public void setLearningRate(double learningRate) {
-        this.learningRate = learningRate;
-    }
-
-    public int getMaxIterate() {
-        return maxIterate;
-    }
-
-    public void setMaxIterate(int maxIterate) {
-        this.maxIterate = maxIterate;
-    }
-
-    public double getDeltaMSE() {
-        return deltaMSE;
-    }
-
-    public void setDeltaMSE(double deltaMSE) {
-        this.deltaMSE = deltaMSE;
-    }
-
-    public double getMomentum() {
-        return momentum;
-    }
-
-    public void setMomentum(double momentum) {
-        this.momentum = momentum;
-    }
-
-    public Double getInitialWeight() {
-        return initialWeight;
-    }
-
-    public void setInitialWeight(Double initialWeight) {
-        this.initialWeight = initialWeight;
+        }
     }
 }
