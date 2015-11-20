@@ -277,7 +277,7 @@ public class MultiLayerPerceptron extends Classifier {
     }
 
     private double[] recursiveBackprop(double[] layerInput, double[] target, int layer) {
-        // TODO add momentum, linear output
+        // TODO add momentum
         // Calculate output
         double[] layerOutput = new double[_neuronPerLayer[layer]];
         for (int neuronIdx = 0; neuronIdx < _neuronPerLayer[layer]; neuronIdx++) {
@@ -294,8 +294,13 @@ public class MultiLayerPerceptron extends Classifier {
                 double[] oldWeights = _neuralNetwork[layer][neuronIdx].getWeights();
                 double[] newWeights = new double[oldWeights.length];
 
-                double neuronError = layerOutput[neuronIdx] * (1 - layerOutput[neuronIdx]) *
-                        (target[neuronIdx] - layerOutput[neuronIdx]);
+                double neuronError;
+                if (_neuralNetwork[layer][neuronIdx].getActivationFunction() == Neuron.ActivationFunction.SIGMOID) {
+                    neuronError = layerOutput[neuronIdx] * (1 - layerOutput[neuronIdx]) *
+                            (target[neuronIdx] - layerOutput[neuronIdx]);
+                } else {
+                    neuronError = target[neuronIdx] - layerOutput[neuronIdx];
+                }
 
                 newWeights[0] = oldWeights[0] + _learningRate * neuronError * 1; // intercept
                 for (int i = 0; i < layerInput.length; i++) {
