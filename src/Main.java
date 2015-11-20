@@ -4,6 +4,7 @@
 
 
 import classifier.ann.DeltaRulePerceptron;
+import classifier.ann.PerceptronTrainingRule;
 import weka.classifiers.Evaluation;
 import weka.core.Instances;
 import weka.core.converters.ConverterUtils.DataSource;
@@ -32,16 +33,29 @@ public class Main {
 //        System.out.print(evaluation.toMatrixString());
 //        System.out.println(evaluation.toSummaryString());
 
-        DeltaRulePerceptron deltaRulePerceptron = new DeltaRulePerceptron();
-        deltaRulePerceptron.setMomentum(0.001);
-        deltaRulePerceptron.setMaxIteration(100);
-        deltaRulePerceptron.setLearningRate(0.01);
-        deltaRulePerceptron.setTerminationDeltaMSE(1e-10);
-        deltaRulePerceptron.buildClassifier(trainInstances);
+//        DeltaRulePerceptron deltaRulePerceptron = new DeltaRulePerceptron();
+//        deltaRulePerceptron.setMomentum(0.001);
+//        deltaRulePerceptron.setMaxIteration(100);
+//        deltaRulePerceptron.setLearningRate(0.01);
+//        deltaRulePerceptron.setTerminationDeltaMSE(1e-10);
+//        deltaRulePerceptron.buildClassifier(trainInstances);
+//        datasource = new DataSource(TRAINDATASETJ48);
+//        Instances testInstances = datasource.getDataSet();
+//        testInstances.setClassIndex(testInstances.numAttributes()-1);
+//        evaluation.evaluateModel(deltaRulePerceptron, testInstances);
+//        System.out.print(evaluation.toMatrixString());
+//        System.out.println(evaluation.toSummaryString());
+        
+        PerceptronTrainingRule perceptronTrainingRule = new PerceptronTrainingRule();
+        perceptronTrainingRule.setMomentum(0.001);
+        perceptronTrainingRule.setMaxIteration(100);
+        perceptronTrainingRule.setLearningRate(0.0001);
+        perceptronTrainingRule.setTerminationDeltaMSE(1e-10);
+        perceptronTrainingRule.buildClassifier(trainInstances);
         datasource = new DataSource(TRAINDATASETJ48);
         Instances testInstances = datasource.getDataSet();
         testInstances.setClassIndex(testInstances.numAttributes()-1);
-        evaluation.evaluateModel(deltaRulePerceptron, testInstances);
+        evaluation.evaluateModel(perceptronTrainingRule, testInstances);
         System.out.print(evaluation.toMatrixString());
         System.out.println(evaluation.toSummaryString());
 

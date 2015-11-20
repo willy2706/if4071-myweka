@@ -53,7 +53,7 @@ public class PerceptronTrainingRule extends Classifier {
 
         // Initialize weight
         initWeight();
-
+        
         // Change input to matrix
         _predictorList = new ArrayList<>();
         Enumeration attrIterator = numericInstances.enumerateAttributes();
@@ -214,9 +214,9 @@ public class PerceptronTrainingRule extends Classifier {
             output += (_lastWeight[i] * input[i]);
         }
         
-        //sign activation function
-        if(output >= 0 ) { output =1; }
-        else { output = 0; }
+//        sign activation function
+        if(output >= 0.0 ) { output =1.0; }
+        else { output = 0.0; }
         return output;
     }
 
@@ -240,7 +240,8 @@ public class PerceptronTrainingRule extends Classifier {
             _initialWeights = new double[_nPredictor + 1];
             Random random = new Random();
             for (int i = 0; i < _nPredictor + 1; i++) {
-                _initialWeights[i] = random.nextDouble();
+//                _initialWeights[i] = random.nextDouble();
+                _initialWeights[i] = 0;
             }
         }
     }
