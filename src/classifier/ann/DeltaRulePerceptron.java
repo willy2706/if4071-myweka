@@ -208,7 +208,7 @@ public class DeltaRulePerceptron extends Classifier {
         return _nIterationDone;
     }
 
-    private double calculateOutput(double[] input) {
+    protected double calculateOutput(double[] input) {
         double output = 0.0;
         for (int i = 0; i < _nPredictor + 1; i++) {
             output += (_lastWeight[i] * input[i]);
