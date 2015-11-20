@@ -220,9 +220,8 @@ public class DeltaRulePerceptron extends Classifier {
         // Calculate error
         double mse = 0.0;
         for (int i = 0; i < instancesInput.length; i++) {
-            mse = (Maths.square(target[i] - predicted[i]) - mse)/(i+1);
+            mse = mse + (Maths.square(target[i] - predicted[i]) - mse) / (i + 1);
         }
-        mse /= instancesInput.length;
 
         return mse;
     }

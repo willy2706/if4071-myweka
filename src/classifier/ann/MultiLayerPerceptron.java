@@ -5,6 +5,7 @@ import weka.core.Attribute;
 import weka.core.Capabilities;
 import weka.core.Instance;
 import weka.core.Instances;
+import weka.core.matrix.Maths;
 import weka.filters.Filter;
 import weka.filters.supervised.attribute.NominalToBinary;
 
@@ -98,7 +99,7 @@ public class MultiLayerPerceptron extends Classifier {
             _predictorList.add(attr);
         }
 
-        double[][] inputs = new double[numericInstances.numInstances()][_nPredictor + 1];
+        double[][] inputs = new double[numericInstances.numInstances()][_nPredictor];
         double[][] outputs = null;
         if (numericInstances.classAttribute().isNominal()) {
             outputs = new double[numericInstances.numInstances()][numericInstances.classAttribute().numValues()];
@@ -118,13 +119,12 @@ public class MultiLayerPerceptron extends Classifier {
             } else if (numericInstances.classAttribute().isNumeric()) {
                 outputs[instIndex][1] = instance.classValue();
             }
-            inputs[instIndex][0] = 1.0;
             for (int i = 0; i < _predictorList.size(); i++) {
-                inputs[instIndex][i + 1] = instance.value(_predictorList.get(i));
+                inputs[instIndex][i] = instance.value(_predictorList.get(i));
             }
         }
 
-        // Learning
+        // Learning Multi Layer Perceptron
 
     }
 
@@ -205,5 +205,39 @@ public class MultiLayerPerceptron extends Classifier {
             weights[i] = random.nextDouble();
         }
         return weights;
+    }
+
+    private double meanSquareErrorEvaluation(double[][] instancesInput, double[][] target) {
+        double[][] predicted = new double[instancesInput.length][];
+        // Calculate prediction
+        for (int i = 0; i < instancesInput.length; i++) {
+            predicted[i] = calculateOutput(instancesInput[i]);
+        }
+
+        // Calculate error
+        double mse = 0.0;
+        for (int inst = 0; inst < instancesInput.length; inst++) {
+            double instSquareError = 0.0;
+            for (int i = 0; i < target[i].length; i++) {
+                instSquareError += Maths.square(target[inst][i] - predicted[inst][i]);
+            }
+
+            mse = mse + (instSquareError - mse) / (inst + 1);
+        }
+
+        return mse;
+    }
+
+    private double[] calculateOutput(double[] input) {
+        double[] layerInput = input;
+        double[] layerOutput = null;
+        for (int layer = 0; layer < _neuronPerLayer.length; layer++) {
+            layerOutput = new double[_neuronPerLayer[layer]];
+            for (int i = 0; i < _neuronPerLayer[layer]; i++) {
+                layerOutput[i] = _neuralNetwork[layer][i].calculateOutput(layerInput);
+            }
+            layerInput = layerOutput;
+        }
+        return layerOutput;
     }
 }
