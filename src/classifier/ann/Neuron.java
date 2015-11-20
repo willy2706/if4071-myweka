@@ -35,10 +35,6 @@ public class Neuron {
         }
     }
 
-    public void updateWeight(double error) {
-        // TODO implement
-    }
-
     public enum ActivationFunction {
         LINEAR,
         SIGMOID
