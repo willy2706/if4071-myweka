@@ -1,12 +1,13 @@
 package classifier.ann;
 
-import weka.core.*;
+import weka.core.Attribute;
+import weka.core.Instance;
+import weka.core.Instances;
 import weka.filters.Filter;
 import weka.filters.supervised.attribute.NominalToBinary;
 
 import java.util.ArrayList;
 import java.util.Enumeration;
-import java.util.List;
 
 /**
  * Created by nim_13512065 on 11/13/15.
@@ -57,34 +58,39 @@ public class DeltaBatchRule extends DeltaRulePerceptron {
         }
 
         // Training Delta Rule Perceptron
-        _prevWeight = null;
         _lastWeight = _initialWeights;
         double prevMse = meanSquareErrorEvaluation(inputs, targets);
+        double[] prevDeltaWeight = null;
+        double[] deltaWeight = null;
         for (int it = 0; it < _maxIteration; it++) {
-
-            double[] deltaWeight = new double[_initialWeights.length];
+            if (it > 0) {
+                prevDeltaWeight = deltaWeight;
+            } else {
+                prevDeltaWeight = new double[_initialWeights.length];
+                for (int z = 0; z < prevDeltaWeight.length; ++z) {
+                    prevDeltaWeight[z] = 0.0;
+                }
+            }
             double[] newWeight = new double[_initialWeights.length];
-            for (int instIndex = 0; instIndex < inputs.length; instIndex++) {
 
+            deltaWeight = new double[_initialWeights.length];
+            for (int z = 0; z < deltaWeight.length; ++z) {
+                deltaWeight[z] = 0.0;
+            }
+
+            for (int instIndex = 0; instIndex < inputs.length; instIndex++) {
                 // calculate delta weight
                 double predicted = calculateOutput(inputs[instIndex]); //predicted adalah y
 
                 for (int i = 0; i < deltaWeight.length; i++) {
-                    double prevDeltaWeight;
-                    if (it > 0) {
-                        prevDeltaWeight = _lastWeight[i] - _prevWeight[i];
-                    } else {
-                        prevDeltaWeight = 0;
-                    }
                     deltaWeight[i] +=  _learningRate * (targets[instIndex] - predicted) * inputs[instIndex][i]
-                            + (_momentum * prevDeltaWeight);
+                            + (_momentum * prevDeltaWeight[i]);
                     if (instIndex == inputs.length-1) {
                         newWeight[i] = _lastWeight[i] + deltaWeight[i];
                     }
                 }
             }
             // Store update
-            _prevWeight = _lastWeight;
             _lastWeight = newWeight;
 
             _nIterationDone = it + 1;
