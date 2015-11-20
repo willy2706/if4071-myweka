@@ -3,17 +3,18 @@
  */
 
 
+import classifier.ann.DeltaBatchRule;
 import classifier.ann.DeltaRulePerceptron;
 import weka.classifiers.Evaluation;
 import weka.core.Instances;
 import weka.core.converters.ConverterUtils.DataSource;
 
 public class Main {
-    public final static String FOLDER = "dataset/";
-    public final static String TRAINDATASETJ48 = FOLDER + "weather.nominal.arff";
+    public final static String FOLDER = "myweka/dataset/";
+    public final static String TRAINDATASET = FOLDER + "masayu.dataset1.arff";
     public final static String TESTDATASETJ48 = FOLDER + "test.weather.nominal.arff";
     public static void main(String[] args) throws Exception {
-        DataSource datasource = new DataSource(TRAINDATASETJ48);
+        DataSource datasource = new DataSource(TRAINDATASET);
         Instances trainInstances = datasource.getDataSet();
         trainInstances.setClassIndex(trainInstances.numAttributes()-1);
         Evaluation evaluation = new Evaluation(trainInstances);
@@ -32,13 +33,13 @@ public class Main {
 //        System.out.print(evaluation.toMatrixString());
 //        System.out.println(evaluation.toSummaryString());
 
-        DeltaRulePerceptron deltaRulePerceptron = new DeltaRulePerceptron();
-        deltaRulePerceptron.setMomentum(0.001);
-        deltaRulePerceptron.setMaxIteration(100);
-        deltaRulePerceptron.setLearningRate(0.01);
-        deltaRulePerceptron.setTerminationDeltaMSE(1e-10);
+        DeltaBatchRule deltaRulePerceptron = new DeltaBatchRule();
+        deltaRulePerceptron.setMomentum(0);
+        deltaRulePerceptron.setMaxIteration(10);
+        deltaRulePerceptron.setLearningRate(0.1);
+        deltaRulePerceptron.setTerminationDeltaMSE(1e-2);
         deltaRulePerceptron.buildClassifier(trainInstances);
-        datasource = new DataSource(TRAINDATASETJ48);
+        datasource = new DataSource(TRAINDATASET);
         Instances testInstances = datasource.getDataSet();
         testInstances.setClassIndex(testInstances.numAttributes()-1);
         evaluation.evaluateModel(deltaRulePerceptron, testInstances);
