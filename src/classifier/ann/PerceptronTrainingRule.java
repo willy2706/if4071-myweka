@@ -55,7 +55,7 @@ public class PerceptronTrainingRule extends Classifier {
         initWeight();
         
         // Change input to matrix
-        _predictorList = new ArrayList<>();
+        _predictorList = new ArrayList<Attribute>();
         Enumeration attrIterator = numericInstances.enumerateAttributes();
         while (attrIterator.hasMoreElements()) {
             Attribute attr = (Attribute) attrIterator.nextElement();
