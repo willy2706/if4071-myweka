@@ -41,7 +41,7 @@ public class PerceptronTrainingRule extends MyANN{
         }
         
         //change input to matrix
-        inputs = new ArrayList<>();
+        inputs = new ArrayList<double[]>();
         double[] targets = new double[data.numInstances()+1];
         Enumeration instanceIterator = data.enumerateInstances();
         int it=0;

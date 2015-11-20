@@ -27,7 +27,6 @@ public class DeltaRulePerceptron extends Classifier {
     private double[] _lastWeight;
 
     public DeltaRulePerceptron() {
-
         // Initialization with default value
         _learningRate = 0.1;
         _momentum = 0.0;
@@ -55,7 +54,7 @@ public class DeltaRulePerceptron extends Classifier {
         initWeight();
 
         // Change input to matrix
-        _predictorList = new ArrayList<>();
+        _predictorList = new ArrayList<Attribute>();
         Enumeration attrIterator = numericInstances.enumerateAttributes();
         while (attrIterator.hasMoreElements()) {
             Attribute attr = (Attribute) attrIterator.nextElement();
