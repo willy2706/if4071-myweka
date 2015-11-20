@@ -32,6 +32,7 @@ public class DeltaRulePerceptron extends Classifier {
         _momentum = 0.0;
         _terminationDeltaMSE = 1e-4;
         _maxIteration = 200;
+        _nIterationDone = 0;
     }
 
     @Override
@@ -54,7 +55,7 @@ public class DeltaRulePerceptron extends Classifier {
         initWeight();
 
         // Change input to matrix
-        _predictorList = new ArrayList<Attribute>();
+        _predictorList = new ArrayList<>();
         Enumeration attrIterator = numericInstances.enumerateAttributes();
         while (attrIterator.hasMoreElements()) {
             Attribute attr = (Attribute) attrIterator.nextElement();
@@ -201,6 +202,10 @@ public class DeltaRulePerceptron extends Classifier {
 
     public void setLearningRate(double learningRate) {
         this._learningRate = learningRate;
+    }
+
+    public int getEpochDone() {
+        return _nIterationDone;
     }
 
     private double calculateOutput(double[] input) {

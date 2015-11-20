@@ -1,10 +1,7 @@
 package classifier.ann;
 
 import weka.classifiers.Classifier;
-import weka.core.Attribute;
-import weka.core.Capabilities;
-import weka.core.Instance;
-import weka.core.Instances;
+import weka.core.*;
 import weka.core.matrix.Maths;
 import weka.filters.Filter;
 import weka.filters.supervised.attribute.NominalToBinary;
@@ -20,14 +17,16 @@ public class MultiLayerPerceptron extends Classifier {
     private double _momentum;
     private double _terminationDeltaMSE;
     private int _nPredictor;
+    private List<Attribute> _predictorList;
 
     private int[] _neuronPerHiddenLayer;
     private int[] _neuronPerLayer;
     private Boolean _isLinearOutput;
     private Neuron[][] _neuralNetwork;
-    private List<Attribute> _predictorList;
 
     private NominalToBinary _nominalToBinary;
+
+    private int _nIterationDone;
 
     public MultiLayerPerceptron() {
         // Initialization with default value
@@ -38,6 +37,7 @@ public class MultiLayerPerceptron extends Classifier {
         _neuronPerHiddenLayer = null;
         _neuronPerLayer = null;
         _isLinearOutput = null;
+        _nIterationDone = 0;
     }
 
     @Override
@@ -115,9 +115,10 @@ public class MultiLayerPerceptron extends Classifier {
         for (int instIndex = 0; instIndex < numericInstances.numInstances(); instIndex++) {
             Instance instance = numericInstances.instance(instIndex);
             if (numericInstances.classAttribute().isNominal()) {
-                outputs[instIndex][(int) instance.classValue()] = 1.0;
+                int index = (int) instance.classValue();
+                outputs[instIndex][index] = 1.0;
             } else if (numericInstances.classAttribute().isNumeric()) {
-                outputs[instIndex][1] = instance.classValue();
+                outputs[instIndex][0] = instance.classValue();
             }
             for (int i = 0; i < _predictorList.size(); i++) {
                 inputs[instIndex][i] = instance.value(_predictorList.get(i));
@@ -125,12 +126,40 @@ public class MultiLayerPerceptron extends Classifier {
         }
 
         // Learning Multi Layer Perceptron
+        double prevMse = meanSquareErrorEvaluation(inputs, outputs);
+        for (int iter = 0; iter < _maxIteration; iter++) {
+
+            for (int instIndex = 0; instIndex < inputs.length; instIndex++) {
+                // TODO backprop learning at this place
+                double[] predicted = calculateOutput(inputs[instIndex]);
+                backpropUpdate(predicted, outputs[instIndex]);
+            }
+
+            _nIterationDone = iter + 1;
+            double mseEvaluation = meanSquareErrorEvaluation(inputs, outputs);
+            System.out.println("Epoch " + _nIterationDone + " MSE: " + mseEvaluation);
+            System.out.println("Epoch " + _nIterationDone + " Delta MSE: " + (prevMse - mseEvaluation));
+            if (Math.abs(prevMse - mseEvaluation) < _terminationDeltaMSE) break;
+            prevMse = mseEvaluation;
+
+            // TODO output weight for each epoch
+        }
 
     }
 
     @Override
-    public double[] distributionForInstance(Instance instance) {
-        return new double[0];
+    public double[] distributionForInstance(Instance instance) throws Exception {
+        if (instance.hasMissingValue()) {
+            throw new NoSupportForMissingValuesException("MultiLayerPerceptron: cannot handle missing value");
+        }
+        _nominalToBinary.input(instance);
+        Instance numericInstance = _nominalToBinary.output();
+        double[] input = new double[_nPredictor];
+        for (int i = 0; i < _predictorList.size(); i++) {
+            input[i] = numericInstance.value(_predictorList.get(i));
+        }
+
+        return calculateOutput(input);
     }
 
     @Override
@@ -198,6 +227,10 @@ public class MultiLayerPerceptron extends Classifier {
         _neuronPerHiddenLayer = neuronPerHiddenLayer;
     }
 
+    public int getEpochDone() {
+        return _nIterationDone;
+    }
+
     private double[] generateRandomWeight(int length) {
         double[] weights = new double[length];
         Random random = new Random();
@@ -239,5 +272,9 @@ public class MultiLayerPerceptron extends Classifier {
             layerInput = layerOutput;
         }
         return layerOutput;
+    }
+
+    private void backpropUpdate(double[] predicted, double[] output) {
+        // TODO implement
     }
 }
