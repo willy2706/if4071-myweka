@@ -100,14 +100,4 @@ public class DeltaBatchRule extends DeltaRulePerceptron {
 
         }
     }
-
-    @Override
-    public double[] distributionForInstance(Instance instance) {
-        return new double[0];
-    }
-
-    @Override
-    public double classifyInstance(Instance instance) {
-        return 0;
-    }
 }
