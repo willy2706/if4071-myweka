@@ -1,5 +1,6 @@
 package classifier.ann;
 
+import org.w3c.dom.Attr;
 import weka.classifiers.Classifier;
 import weka.core.*;
 import weka.core.matrix.Maths;
@@ -92,7 +93,7 @@ public class MultiLayerPerceptron extends Classifier {
         }
 
         // Change input and output to matrix
-        _predictorList = new ArrayList<>();
+        _predictorList = new ArrayList<Attribute>();
         Enumeration attrIterator = numericInstances.enumerateAttributes();
         while (attrIterator.hasMoreElements()) {
             Attribute attr = (Attribute) attrIterator.nextElement();
