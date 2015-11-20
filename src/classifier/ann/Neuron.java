@@ -23,12 +23,16 @@ public class Neuron {
     }
 
     public double calculateOutput(double[] input) {
-        // TODO implement
-        return 0;
-    }
+        double output = _weights[0];
+        for (int predIdx = 0; predIdx < input.length; predIdx++) {
+            output += _weights[predIdx + 1] * input[predIdx];
+        }
 
-    public void updateWeight(double error) {
-        // TODO implement
+        if (_activationFunction == ActivationFunction.SIGMOID) {
+            return 1.0 / (1.0 + Math.exp(-output));
+        } else { // Linear Output, same with no using activation function
+            return output;
+        }
     }
 
     public enum ActivationFunction {
