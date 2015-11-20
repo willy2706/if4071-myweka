@@ -4,10 +4,14 @@ package classifier.ann;
 public class Neuron {
 
     private double[] _weights;
+    private double[] _prevWeights;
+
     private ActivationFunction _activationFunction;
 
     public Neuron(ActivationFunction activationFunction) {
         _activationFunction = activationFunction;
+        _weights = null;
+        _prevWeights = null;
     }
 
     public double[] getWeights() {
@@ -15,6 +19,7 @@ public class Neuron {
     }
 
     public void setWeights(double[] weights) {
+        _prevWeights = _weights;
         _weights = weights;
     }
 
@@ -33,6 +38,10 @@ public class Neuron {
         } else { // Linear Output, same with no using activation function
             return output;
         }
+    }
+
+    public double[] getPrevWeights() {
+        return _prevWeights;
     }
 
     public enum ActivationFunction {

@@ -278,7 +278,6 @@ public class MultiLayerPerceptron extends Classifier {
     }
 
     private double[] recursiveBackprop(double[] layerInput, double[] target, int layer) {
-        // TODO add momentum
         // Calculate output
         double[] layerOutput = new double[_neuronPerLayer[layer]];
         for (int neuronIdx = 0; neuronIdx < _neuronPerLayer[layer]; neuronIdx++) {
@@ -292,8 +291,13 @@ public class MultiLayerPerceptron extends Classifier {
             for (int i = 0; i < prevLayerNeuronError.length; i++) prevLayerNeuronError[i] = 0.0;
 
             for (int neuronIdx = 0; neuronIdx < _neuronPerLayer[layer]; neuronIdx++) {
-                double[] oldWeights = _neuralNetwork[layer][neuronIdx].getWeights();
-                double[] newWeights = new double[oldWeights.length];
+                double[] weights = _neuralNetwork[layer][neuronIdx].getWeights();
+                double[] prevWeights = _neuralNetwork[layer][neuronIdx].getPrevWeights();
+                if (prevWeights == null) {
+                    prevWeights = new double[weights.length];
+                    System.arraycopy(weights, 0, prevWeights, 0, weights.length);
+                }
+                double[] newWeights = new double[weights.length];
 
                 double neuronError;
                 if (_neuralNetwork[layer][neuronIdx].getActivationFunction() == Neuron.ActivationFunction.SIGMOID) {
@@ -303,10 +307,12 @@ public class MultiLayerPerceptron extends Classifier {
                     neuronError = target[neuronIdx] - layerOutput[neuronIdx];
                 }
 
-                newWeights[0] = oldWeights[0] + _learningRate * neuronError * 1; // intercept
+                newWeights[0] = weights[0] + _learningRate * neuronError * 1 +
+                        _momentum * (weights[0] - prevWeights[0]); // intercept
                 for (int i = 0; i < layerInput.length; i++) {
-                    newWeights[i + 1] = oldWeights[i + 1] + _learningRate * neuronError * layerInput[i];
-                    prevLayerNeuronError[i] += oldWeights[i + 1] * neuronError;
+                    newWeights[i + 1] = weights[i + 1] + _learningRate * neuronError * layerInput[i] +
+                            +_momentum * (weights[i + 1] - prevWeights[i + 1]);
+                    prevLayerNeuronError[i] += weights[i + 1] * neuronError;
                 }
                 _neuralNetwork[layer][neuronIdx].setWeights(newWeights);
             }
@@ -321,15 +327,22 @@ public class MultiLayerPerceptron extends Classifier {
             for (int i = 0; i < prevLayerNeuronError.length; i++) prevLayerNeuronError[i] = 0.0;
 
             for (int neuronIdx = 0; neuronIdx < _neuronPerLayer[layer]; neuronIdx++) {
-                double[] oldWeights = _neuralNetwork[layer][neuronIdx].getWeights();
-                double[] newWeights = new double[oldWeights.length];
+                double[] weights = _neuralNetwork[layer][neuronIdx].getWeights();
+                double[] prevWeights = _neuralNetwork[layer][neuronIdx].getPrevWeights();
+                if (prevWeights == null) {
+                    prevWeights = new double[weights.length];
+                    System.arraycopy(weights, 0, prevWeights, 0, weights.length);
+                }
+                double[] newWeights = new double[weights.length];
 
                 double neuronError = layerOutput[neuronIdx] * (1 - layerOutput[neuronIdx]) * eachNeuronError[neuronIdx];
 
-                newWeights[0] = oldWeights[0] + _learningRate * neuronError * 1; // intercept
+                newWeights[0] = weights[0] + _learningRate * neuronError * 1 +
+                        _momentum * (weights[0] - prevWeights[0]); // intercept
                 for (int i = 0; i < layerInput.length; i++) {
-                    newWeights[i + 1] = oldWeights[i + 1] + _learningRate * neuronError * layerInput[i];
-                    prevLayerNeuronError[i] += oldWeights[i + 1] * neuronError;
+                    newWeights[i + 1] = weights[i + 1] + _learningRate * neuronError * layerInput[i] +
+                            _momentum * (weights[i + 1] - prevWeights[i + 1]);
+                    prevLayerNeuronError[i] += weights[i + 1] * neuronError;
                 }
                 _neuralNetwork[layer][neuronIdx].setWeights(newWeights);
             }
