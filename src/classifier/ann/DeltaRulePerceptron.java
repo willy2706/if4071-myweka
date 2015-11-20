@@ -12,19 +12,19 @@ import java.util.List;
 import java.util.Random;
 
 public class DeltaRulePerceptron extends Classifier {
-    private int _nPredictor;
-    private double[] _initialWeights;
-    private double _learningRate;
-    private int _maxIteration;
-    private double _momentum;
-    private double _terminationDeltaMSE;
-    private List<Attribute> _predictorList;
+    protected int _nPredictor;
+    protected double[] _initialWeights;
+    protected double _learningRate;
+    protected int _maxIteration;
+    protected double _momentum;
+    protected double _terminationDeltaMSE;
+    protected List<Attribute> _predictorList;
 
-    private NominalToBinary _nominalToBinary;
+    protected NominalToBinary _nominalToBinary;
 
-    private int _nIterationDone;
-    private double[] _prevWeight;
-    private double[] _lastWeight;
+    protected int _nIterationDone;
+    protected double[] _prevWeight;
+    protected double[] _lastWeight;
 
     public DeltaRulePerceptron() {
         // Initialization with default value
@@ -203,7 +203,7 @@ public class DeltaRulePerceptron extends Classifier {
         this._learningRate = learningRate;
     }
 
-    private double calculateOutput(double[] input) {
+    protected double calculateOutput(double[] input) {
         double output = 0.0;
         for (int i = 0; i < _nPredictor + 1; i++) {
             output += (_lastWeight[i] * input[i]);
@@ -211,7 +211,7 @@ public class DeltaRulePerceptron extends Classifier {
         return output;
     }
 
-    private double meanSquareErrorEvaluation(double[][] instancesInput, double[] target) {
+    protected double meanSquareErrorEvaluation(double[][] instancesInput, double[] target) {
         double[] predicted = new double[instancesInput.length];
         // Calculate prediction
         for (int i = 0; i < instancesInput.length; i++) {
@@ -227,7 +227,7 @@ public class DeltaRulePerceptron extends Classifier {
         return mse;
     }
 
-    private void initWeight() {
+    protected void initWeight() {
         if (_initialWeights == null || _initialWeights.length != (_nPredictor + 1)) {
             _initialWeights = new double[_nPredictor + 1];
             Random random = new Random();
