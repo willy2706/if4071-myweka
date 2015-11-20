@@ -159,7 +159,6 @@ public class DeltaRulePerceptron extends Classifier {
         // class
         result.enable(Capabilities.Capability.BINARY_CLASS);
         result.enable(Capabilities.Capability.NUMERIC_CLASS);
-        result.enable(Capabilities.Capability.DATE_CLASS);
         result.enable(Capabilities.Capability.MISSING_CLASS_VALUES);
 
         return result;
@@ -169,7 +168,7 @@ public class DeltaRulePerceptron extends Classifier {
         _initialWeights = weights;
     }
 
-    public double[] getWeights() {
+    public double[] getInitialWeights() {
         return _initialWeights;
     }
 
@@ -189,8 +188,16 @@ public class DeltaRulePerceptron extends Classifier {
         this._momentum = momentum;
     }
 
+    public int getMaxIteration() {
+        return _maxIteration;
+    }
+
     public void setMaxIteration(int maxIteration) {
         this._maxIteration = maxIteration;
+    }
+
+    public double getLearningRate() {
+        return _learningRate;
     }
 
     public void setLearningRate(double learningRate) {
