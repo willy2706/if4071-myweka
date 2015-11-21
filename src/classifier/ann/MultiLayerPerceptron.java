@@ -293,7 +293,7 @@ public class MultiLayerPerceptron extends Classifier {
             for (int i = 0; i < target[i].length; i++) {
                 instSquareError += Maths.square(target[inst][i] - predicted[inst][i]);
             }
-            mse = instSquareError / 2;
+            mse = mse + instSquareError / 2;
 //            mse = mse + (instSquareError - mse) / (inst + 1);
         }
 
@@ -313,8 +313,8 @@ public class MultiLayerPerceptron extends Classifier {
         return layerOutput;
     }
 
-    private void backpropUpdate(double[] input, double[] output) {
-        recursiveBackprop(input, output, 0);
+    private void backpropUpdate(double[] input, double[] target) {
+        recursiveBackprop(input, target, 0);
     }
 
     private double[] recursiveBackprop(double[] layerInput, double[] target, int layer) {

@@ -38,6 +38,7 @@ public class Main {
         multiLayerPerceptron.setNeuronPerHiddenLayer(new int[]{2});
         multiLayerPerceptron.setIsVerbose(true);
         multiLayerPerceptron.putInitialWeightZero();
+        multiLayerPerceptron.setIsLinearOutput(false);
         multiLayerPerceptron.buildClassifier(trainInstances);
         datasource = new DataSource(TRAINDATASET);
         Instances testInstances = datasource.getDataSet();

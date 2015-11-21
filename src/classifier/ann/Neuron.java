@@ -32,12 +32,12 @@ public class Neuron {
         for (int predIdx = 0; predIdx < input.length; predIdx++) {
             output += _weights[predIdx + 1] * input[predIdx];
         }
-        return 1.0 / (1.0 + Math.exp(-output));
-//        if (_activationFunction == ActivationFunction.SIGMOID) {
-//            return 1.0 / (1.0 + Math.exp(-output));
-//        } else { // Linear Output, same with no using activation function
-//            return output;
-//        }
+//        return 1.0 / (1.0 + Math.exp(-output));
+        if (_activationFunction == ActivationFunction.SIGMOID) {
+            return 1.0 / (1.0 + Math.exp(-output));
+        } else { // Linear Output, same with no using activation function
+            return output;
+        }
     }
 
     public double[] getPrevWeights() {
