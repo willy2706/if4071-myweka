@@ -19,12 +19,11 @@ public class DeltaRulePerceptron extends Classifier {
     protected double _momentum;
     protected double _terminationDeltaMSE;
     protected List<Attribute> _predictorList;
-
     protected NominalToBinary _nominalToBinary;
-
     protected int _nIterationDone;
     protected double[] _prevWeight;
     protected double[] _lastWeight;
+    private boolean _isVerbose;
 
     public DeltaRulePerceptron() {
         // Initialization with default value
@@ -33,6 +32,7 @@ public class DeltaRulePerceptron extends Classifier {
         _terminationDeltaMSE = 1e-4;
         _maxIteration = 200;
         _nIterationDone = 0;
+        _isVerbose = false;
     }
 
     @Override
@@ -55,7 +55,7 @@ public class DeltaRulePerceptron extends Classifier {
         initWeight();
 
         // Change input to matrix
-        _predictorList = new ArrayList<Attribute>();
+        _predictorList = new ArrayList<>();
         Enumeration attrIterator = numericInstances.enumerateAttributes();
         while (attrIterator.hasMoreElements()) {
             Attribute attr = (Attribute) attrIterator.nextElement();
@@ -104,17 +104,22 @@ public class DeltaRulePerceptron extends Classifier {
 
             _nIterationDone = it + 1;
             double mseEvaluation = meanSquareErrorEvaluation(inputs, targets);
-            System.out.println("Epoch " + _nIterationDone + " MSE: " + mseEvaluation);
-            System.out.println("Epoch " + _nIterationDone + " Delta MSE: " + (prevMse - mseEvaluation));
+            if (_isVerbose) {
+                System.out.println("Epoch " + _nIterationDone + " MSE: " + mseEvaluation);
+                System.out.println("Epoch " + _nIterationDone + " Delta MSE: " + (prevMse - mseEvaluation));
+            }
             if (Math.abs(prevMse - mseEvaluation) < _terminationDeltaMSE) break;
             prevMse = mseEvaluation;
 
             // Output weight for each epoch
-            System.out.print("Epoch " + _nIterationDone + " Weight: ");
-            for (int i = 0; i < _initialWeights.length; i++) {
-                System.out.print("" + i + ")" + _lastWeight[i] + " ");
+            if (_isVerbose) {
+                System.out.print("Epoch " + _nIterationDone + " weights: ");
+                for (int i = 0; i < _initialWeights.length; i++) {
+                    System.out.print("" + i + ")" + _lastWeight[i] + " ");
+                }
+                System.out.println();
+                System.out.println();
             }
-            System.out.println();
 
         }
     }
@@ -206,6 +211,14 @@ public class DeltaRulePerceptron extends Classifier {
 
     public int getEpochDone() {
         return _nIterationDone;
+    }
+
+    public boolean isVerbose() {
+        return _isVerbose;
+    }
+
+    public void setIsVerbose(boolean isVerbose) {
+        _isVerbose = isVerbose;
     }
 
     protected double calculateOutput(double[] input) {

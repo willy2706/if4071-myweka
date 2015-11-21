@@ -1,6 +1,5 @@
 package classifier.ann;
 
-import org.w3c.dom.Attr;
 import weka.classifiers.Classifier;
 import weka.core.*;
 import weka.core.matrix.Maths;
@@ -17,6 +16,7 @@ public class MultiLayerPerceptron extends Classifier {
     private int _maxIteration;
     private double _momentum;
     private double _terminationDeltaMSE;
+    private boolean _isVerbose;
     private int _nPredictor;
     private List<Attribute> _predictorList;
 
@@ -39,6 +39,7 @@ public class MultiLayerPerceptron extends Classifier {
         _neuronPerLayer = null;
         _isLinearOutput = null;
         _nIterationDone = 0;
+        _isVerbose = false;
     }
 
     @Override
@@ -93,7 +94,7 @@ public class MultiLayerPerceptron extends Classifier {
         }
 
         // Change input and output to matrix
-        _predictorList = new ArrayList<Attribute>();
+        _predictorList = new ArrayList<>();
         Enumeration attrIterator = numericInstances.enumerateAttributes();
         while (attrIterator.hasMoreElements()) {
             Attribute attr = (Attribute) attrIterator.nextElement();
@@ -117,8 +118,10 @@ public class MultiLayerPerceptron extends Classifier {
             Instance instance = numericInstances.instance(instIndex);
             if (numericInstances.classAttribute().isNominal()) {
                 int index = (int) instance.classValue();
+                assert outputs != null;
                 outputs[instIndex][index] = 1.0;
             } else if (numericInstances.classAttribute().isNumeric()) {
+                assert outputs != null;
                 outputs[instIndex][0] = instance.classValue();
             }
             for (int i = 0; i < _predictorList.size(); i++) {
@@ -130,18 +133,27 @@ public class MultiLayerPerceptron extends Classifier {
         double prevMse = meanSquareErrorEvaluation(inputs, outputs);
         for (int iter = 0; iter < _maxIteration; iter++) {
 
+            // Backprop learning
             for (int instIndex = 0; instIndex < inputs.length; instIndex++) {
+                assert outputs != null;
                 backpropUpdate(inputs[instIndex], outputs[instIndex]);
             }
 
+            // Check termination condition
             _nIterationDone = iter + 1;
             double mseEvaluation = meanSquareErrorEvaluation(inputs, outputs);
-            System.out.println("Epoch " + _nIterationDone + " MSE: " + mseEvaluation);
-            System.out.println("Epoch " + _nIterationDone + " Delta MSE: " + (prevMse - mseEvaluation));
+            if (_isVerbose) {
+                System.out.println("Epoch " + _nIterationDone + " MSE: " + mseEvaluation);
+                System.out.println("Epoch " + _nIterationDone + " Delta MSE: " + (prevMse - mseEvaluation));
+            }
             if (Math.abs(prevMse - mseEvaluation) < _terminationDeltaMSE) break;
             prevMse = mseEvaluation;
 
-            // TODO output weight for each epoch
+            // Output weights
+            if (_isVerbose) {
+                outputNeuronsWeights();
+                System.out.println();
+            }
         }
 
     }
@@ -228,6 +240,28 @@ public class MultiLayerPerceptron extends Classifier {
 
     public int getEpochDone() {
         return _nIterationDone;
+    }
+
+    public boolean isVerbose() {
+        return _isVerbose;
+    }
+
+    public void setIsVerbose(boolean isVerbose) {
+        _isVerbose = isVerbose;
+    }
+
+    private void outputNeuronsWeights() {
+        for (int layer = 0; layer < _neuralNetwork.length; layer++) {
+            System.out.println("Layer " + layer);
+            for (int neuronIdx = 0; neuronIdx < _neuralNetwork[layer].length; neuronIdx++) {
+                System.out.print("    Neuron " + neuronIdx + " weights: ");
+                double[] weights = _neuralNetwork[layer][neuronIdx].getWeights();
+                for (int w = 0; w < weights.length; w++) {
+                    System.out.print("" + w + ")" + weights[w] + " ");
+                }
+                System.out.println();
+            }
+        }
     }
 
     private double[] generateRandomWeight(int length) {
