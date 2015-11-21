@@ -28,6 +28,7 @@ public class MultiLayerPerceptron extends Classifier {
     private NominalToBinary _nominalToBinary;
 
     private int _nIterationDone;
+    private Double initWeight;
 
     public MultiLayerPerceptron() {
         // Initialization with default value
@@ -40,6 +41,7 @@ public class MultiLayerPerceptron extends Classifier {
         _isLinearOutput = null;
         _nIterationDone = 0;
         _isVerbose = false;
+        initWeight = null;
     }
 
     @Override
@@ -146,7 +148,7 @@ public class MultiLayerPerceptron extends Classifier {
                 System.out.println("Epoch " + _nIterationDone + " MSE: " + mseEvaluation);
                 System.out.println("Epoch " + _nIterationDone + " Delta MSE: " + (prevMse - mseEvaluation));
             }
-            if (Math.abs(prevMse - mseEvaluation) < _terminationDeltaMSE) break;
+            if (mseEvaluation < _terminationDeltaMSE) break;
             prevMse = mseEvaluation;
 
             // Output weights
@@ -268,7 +270,11 @@ public class MultiLayerPerceptron extends Classifier {
         double[] weights = new double[length];
         Random random = new Random();
         for (int i = 0; i < length; i++) {
-            weights[i] = random.nextDouble();
+            if (initWeight != null) {
+                weights[i] = initWeight;
+            } else  {
+                weights[i] = random.nextDouble();
+            }
         }
         return weights;
     }
@@ -287,8 +293,8 @@ public class MultiLayerPerceptron extends Classifier {
             for (int i = 0; i < target[i].length; i++) {
                 instSquareError += Maths.square(target[inst][i] - predicted[inst][i]);
             }
-
-            mse = mse + (instSquareError - mse) / (inst + 1);
+            mse = instSquareError / 2;
+//            mse = mse + (instSquareError - mse) / (inst + 1);
         }
 
         return mse;
@@ -386,4 +392,7 @@ public class MultiLayerPerceptron extends Classifier {
         }
     }
 
+    public void putInitialWeightZero() {
+        initWeight = 0.0;
+    }
 }

@@ -5,8 +5,8 @@ import weka.core.Instances;
 import weka.core.converters.ConverterUtils.DataSource;
 
 public class Main {
-    public final static String FOLDER = "dataset/";
-    public final static String TRAINDATASET = FOLDER + "weather.nominal.arff";
+    public final static String FOLDER = "myweka/dataset/";
+    public final static String TRAINDATASET = FOLDER + "masayu.dataset1.arff";
     public final static String TESTDATASETJ48 = FOLDER + "test.weather.nominal.arff";
     public static void main(String[] args) throws Exception {
         DataSource datasource = new DataSource(TRAINDATASET);
@@ -17,17 +17,6 @@ public class Main {
 
 
         /*what we will use*/
-//        DeltaBatchRule deltaBatchRule = new DeltaBatchRule();
-//        deltaBatchRule.setInitialWeight(1.0);
-//        deltaBatchRule.setMaxIterate(10);
-//        deltaBatchRule.buildClassifier(trainInstances);;
-//        datasource = new DataSource(TESTDATASETJ48);
-//        Instances testInstances = datasource.getDataSet();
-//        testInstances.setClassIndex(testInstances.numAttributes()-1);
-//        evaluation.evaluateModel(deltaBatchRule, testInstances);
-//        System.out.print(evaluation.toMatrixString());
-//        System.out.println(evaluation.toSummaryString());
-
 //        DeltaRulePerceptron deltaRulePerceptron = new DeltaRulePerceptron();
 //        deltaRulePerceptron.setMomentum(0.001);
 //        deltaRulePerceptron.setMaxIteration(100);
@@ -42,11 +31,13 @@ public class Main {
 //        System.out.println(evaluation.toSummaryString());
 
         MultiLayerPerceptron multiLayerPerceptron = new MultiLayerPerceptron();
-        multiLayerPerceptron.setMomentum(0.1);
-        multiLayerPerceptron.setMaxIteration(300);
-        multiLayerPerceptron.setLearningRate(0.5);
-        multiLayerPerceptron.setTerminationDeltaMSE(1e-10);
-        multiLayerPerceptron.setNeuronPerHiddenLayer(new int[]{5, 3});
+        multiLayerPerceptron.setMomentum(0);
+        multiLayerPerceptron.setMaxIteration(10);
+        multiLayerPerceptron.setLearningRate(0.1);
+        multiLayerPerceptron.setTerminationDeltaMSE(1e-2);
+        multiLayerPerceptron.setNeuronPerHiddenLayer(new int[]{2});
+        multiLayerPerceptron.setIsVerbose(true);
+        multiLayerPerceptron.putInitialWeightZero();
         multiLayerPerceptron.buildClassifier(trainInstances);
         datasource = new DataSource(TRAINDATASET);
         Instances testInstances = datasource.getDataSet();
