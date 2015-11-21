@@ -94,7 +94,7 @@ public class MultiLayerPerceptron extends Classifier {
         }
 
         // Change input and output to matrix
-        _predictorList = new ArrayList<>();
+        _predictorList = new ArrayList<Attribute>();
         Enumeration attrIterator = numericInstances.enumerateAttributes();
         while (attrIterator.hasMoreElements()) {
             Attribute attr = (Attribute) attrIterator.nextElement();
