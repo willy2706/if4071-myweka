@@ -50,9 +50,6 @@ public class PerceptronTrainingRule extends Classifier {
         Instances numericInstances = Filter.useFilter(data, _nominalToBinary);
 
         _nPredictor = numericInstances.numAttributes() - 1;
-
-        // Initialize weight
-        initWeight();
         
         // Change input to matrix
         _predictorList = new ArrayList<Attribute>();
@@ -235,13 +232,12 @@ public class PerceptronTrainingRule extends Classifier {
         return mse;
     }
 
-    private void initWeight() {
+    public void initWeight() {
         if (_initialWeights == null || _initialWeights.length != (_nPredictor + 1)) {
             _initialWeights = new double[_nPredictor + 1];
             Random random = new Random();
             for (int i = 0; i < _nPredictor + 1; i++) {
-//                _initialWeights[i] = random.nextDouble();
-                _initialWeights[i] = 0;
+                _initialWeights[i] = random.nextDouble();
             }
         }
     }
