@@ -6,12 +6,19 @@ import weka.classifiers.Classifier;
  * Created by nim_13512065 on 11/11/15.
  */
 public abstract class SinglePerceptron extends Classifier {
-    protected boolean verbose;
-    protected double learningRate;
-    protected int maxIteration;
-    protected double momentum;
-    protected double terminationMseThreshold;
+    private boolean verbose;
+    private double learningRate;
+    private int maxIteration;
+    private double momentum;
+    private double terminationMseThreshold;
 
+    public SinglePerceptron() {
+        setLearningRate(0.1);
+        setMomentum(0.0);
+        setTerminationMseThreshold(1e-4);
+        setMaxIteration(200);
+        setVerbose(false);
+    }
     public boolean isVerbose() {
         return verbose;
     }

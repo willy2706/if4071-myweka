@@ -22,11 +22,7 @@ public class PerceptronTrainingRule extends SinglePerceptron {
     private double[] _lastWeight;
 
     public PerceptronTrainingRule() {
-        // Initialization with default value
-        learningRate = 0.1;
-        momentum = 0.0;
-        terminationMseThreshold = 1e-4;
-        maxIteration = 200;
+        super();
         _nIterationDone = 0;
     }
 
@@ -70,7 +66,7 @@ public class PerceptronTrainingRule extends SinglePerceptron {
         _prevWeight = null;
         _lastWeight = _initialWeights;
         double prevMse = meanSquareErrorEvaluation(inputs, outputs);
-        for (int it = 0; it < maxIteration; it++) {
+        for (int it = 0; it < getMaxIteration(); it++) {
 
             for (int instIndex = 0; instIndex < inputs.length; instIndex++) {
 
@@ -84,8 +80,8 @@ public class PerceptronTrainingRule extends SinglePerceptron {
                     } else {
                         prevDeltaWeight = 0;
                     }
-                    double deltaWeight = learningRate * (outputs[instIndex] - predicted) * inputs[instIndex][i]
-                            + (momentum * prevDeltaWeight);
+                    double deltaWeight = getLearningRate() * (outputs[instIndex] - predicted) * inputs[instIndex][i]
+                            + (getMomentum() * prevDeltaWeight);
                     newWeight[i] = _lastWeight[i] + deltaWeight;
                 }
 
@@ -98,7 +94,7 @@ public class PerceptronTrainingRule extends SinglePerceptron {
             double mseEvaluation = meanSquareErrorEvaluation(inputs, outputs);
             System.out.println("Epoch " + _nIterationDone + " MSE: " + mseEvaluation);
             System.out.println("Epoch " + _nIterationDone + " Delta MSE: " + (prevMse - mseEvaluation));
-            if (mseEvaluation < terminationMseThreshold) break;
+            if (mseEvaluation < getTerminationMseThreshold()) break;
 
             // Output weight for each epoch
             System.out.print("Epoch " + _nIterationDone + " Weight: ");

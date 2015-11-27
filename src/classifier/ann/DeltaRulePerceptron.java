@@ -20,13 +20,8 @@ public class DeltaRulePerceptron extends SinglePerceptron {
     private double[] _lastWeight;
 
     public DeltaRulePerceptron() {
-        // Initialization with default value
-        learningRate = 0.1;
-        momentum = 0.0;
-        terminationMseThreshold = 1e-4;
-        maxIteration = 200;
+        super();
         _nIterationDone = 0;
-        verbose = false;
     }
 
     @Override
@@ -71,7 +66,7 @@ public class DeltaRulePerceptron extends SinglePerceptron {
         // Training Delta Rule Perceptron
         _prevWeight = null;
         _lastWeight = _initialWeights;
-        for (int it = 0; it < maxIteration; it++) {
+        for (int it = 0; it < getMaxIteration(); it++) {
 
             for (int instIndex = 0; instIndex < inputs.length; instIndex++) {
 
@@ -85,8 +80,8 @@ public class DeltaRulePerceptron extends SinglePerceptron {
                     } else {
                         prevDeltaWeight = 0;
                     }
-                    double deltaWeight = learningRate * (targets[instIndex] - predicted) * inputs[instIndex][i]
-                            + (momentum * prevDeltaWeight);
+                    double deltaWeight = getLearningRate() * (targets[instIndex] - predicted) * inputs[instIndex][i]
+                            + (getMomentum() * prevDeltaWeight);
                     newWeight[i] = _lastWeight[i] + deltaWeight;
                 }
 
@@ -97,13 +92,13 @@ public class DeltaRulePerceptron extends SinglePerceptron {
 
             _nIterationDone = it + 1;
             double mseEvaluation = meanSquareErrorEvaluation(inputs, targets);
-            if (verbose) {
+            if (isVerbose()) {
                 System.out.println("Epoch " + _nIterationDone + " MSE: " + mseEvaluation);
             }
-            if (mseEvaluation < terminationMseThreshold) break;
+            if (mseEvaluation < getTerminationMseThreshold()) break;
 
             // Output weight for each epoch
-            if (verbose) {
+            if (isVerbose()) {
                 System.out.print("Epoch " + _nIterationDone + " weights: ");
                 for (int i = 0; i < _initialWeights.length; i++) {
                     System.out.print("" + i + ")" + _lastWeight[i] + " ");

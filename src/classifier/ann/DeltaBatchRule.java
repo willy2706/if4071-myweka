@@ -15,21 +15,16 @@ import java.util.Random;
  */
 public class DeltaBatchRule extends SinglePerceptron {
 
-    private int _nPredictor;
-    private double[] _initialWeights;
-    private List<Attribute> _predictorList;
-    private NominalToBinary _nominalToBinary;
-    private int _nIterationDone;
-    private double[] _lastWeight;
+    private int nPredictor;
+    private double[] initialWeights;
+    private List<Attribute> predictorList;
+    private NominalToBinary nominalToBinary;
+    private int nIterationDone;
+    private double[] lastWeight;
 
     public DeltaBatchRule() {
-        // Initialization with default value
-        learningRate = 0.1;
-        momentum = 0.0;
-        terminationMseThreshold = 1e-4;
-        maxIteration = 200;
-        _nIterationDone = 0;
-        verbose = false;
+        super();
+        setnIterationDone(0);
     }
 
     @Override
@@ -42,51 +37,51 @@ public class DeltaBatchRule extends SinglePerceptron {
         data.deleteWithMissingClass();
 
         // change all attr to numeric
-        _nominalToBinary = new NominalToBinary();
-        _nominalToBinary.setInputFormat(data);
-        Instances numericInstances = Filter.useFilter(data, _nominalToBinary);
+        setNominalToBinary(new NominalToBinary());
+        getNominalToBinary().setInputFormat(data);
+        Instances numericInstances = Filter.useFilter(data, getNominalToBinary());
 
-        _nPredictor = numericInstances.numAttributes() - 1;
+        setnPredictor(numericInstances.numAttributes() - 1);
 
         // Initialize weight
         initWeight();
 
         // Change input to matrix
-        _predictorList = new ArrayList<Attribute>();
+        setPredictorList(new ArrayList<Attribute>());
         Enumeration attrIterator = numericInstances.enumerateAttributes();
         while (attrIterator.hasMoreElements()) {
             Attribute attr = (Attribute) attrIterator.nextElement();
-            _predictorList.add(attr);
+            getPredictorList().add(attr);
         }
 
-        double[][] inputs = new double[numericInstances.numInstances()][_initialWeights.length];
+        double[][] inputs = new double[numericInstances.numInstances()][getInitialWeights().length];
         double[] targets = new double[numericInstances.numInstances()];
 
         for (int instIndex = 0; instIndex < numericInstances.numInstances(); instIndex++) {
             Instance instance = numericInstances.instance(instIndex);
             targets[instIndex] = instance.classValue();
             inputs[instIndex][0] = 1.0;
-            for (int i = 0; i < _predictorList.size(); i++) {
-                inputs[instIndex][i + 1] = instance.value(_predictorList.get(i));
+            for (int i = 0; i < getPredictorList().size(); i++) {
+                inputs[instIndex][i + 1] = instance.value(getPredictorList().get(i));
             }
         }
 
         // Training Delta Rule Perceptron
-        _lastWeight = _initialWeights;
+        setLastWeight(getInitialWeights());
         double[] prevDeltaWeight = null;
         double[] deltaWeight = null;
-        for (int it = 0; it < maxIteration; it++) {
+        for (int it = 0; it < getMaxIteration(); it++) {
             if (it > 0) {
                 prevDeltaWeight = deltaWeight;
             } else {
-                prevDeltaWeight = new double[_initialWeights.length];
+                prevDeltaWeight = new double[getInitialWeights().length];
                 for (int z = 0; z < prevDeltaWeight.length; ++z) {
                     prevDeltaWeight[z] = 0.0;
                 }
             }
-            double[] newWeight = new double[_initialWeights.length];
+            double[] newWeight = new double[getInitialWeights().length];
 
-            deltaWeight = new double[_initialWeights.length];
+            deltaWeight = new double[getInitialWeights().length];
             for (int z = 0; z < deltaWeight.length; ++z) {
                 deltaWeight[z] = 0.0;
             }
@@ -96,25 +91,25 @@ public class DeltaBatchRule extends SinglePerceptron {
                 double predicted = calculateOutput(inputs[instIndex]); //predicted adalah y
 
                 for (int i = 0; i < deltaWeight.length; i++) {
-                    deltaWeight[i] +=  learningRate * (targets[instIndex] - predicted) * inputs[instIndex][i]
-                            + (momentum * prevDeltaWeight[i]);
+                    deltaWeight[i] +=  getLearningRate() * (targets[instIndex] - predicted) * inputs[instIndex][i]
+                            + (getMomentum() * prevDeltaWeight[i]);
                     if (instIndex == inputs.length-1) {
-                        newWeight[i] = _lastWeight[i] + deltaWeight[i];
+                        newWeight[i] = getLastWeight()[i] + deltaWeight[i];
                     }
                 }
             }
             // Store update
-            _lastWeight = newWeight;
+            setLastWeight(newWeight);
 
-            _nIterationDone = it + 1;
+            setnIterationDone(it + 1);
             double mseEvaluation = meanSquareErrorEvaluation(inputs, targets);
-            System.out.println("Epoch " + _nIterationDone + " MSE: " + mseEvaluation);
-            if (mseEvaluation < terminationMseThreshold) break;
+            System.out.println("Epoch " + getnIterationDone() + " MSE: " + mseEvaluation);
+            if (mseEvaluation < getTerminationMseThreshold()) break;
 
             // Output weight for each epoch
-            System.out.print("Epoch " + _nIterationDone + " Weight: ");
-            for (int i = 0; i < _initialWeights.length; i++) {
-                System.out.print("" + i + ")" + _lastWeight[i] + " ");
+            System.out.print("Epoch " + getnIterationDone() + " Weight: ");
+            for (int i = 0; i < getInitialWeights().length; i++) {
+                System.out.print("" + i + ")" + getLastWeight()[i] + " ");
             }
             System.out.println();
 
@@ -127,12 +122,12 @@ public class DeltaBatchRule extends SinglePerceptron {
             throw new NoSupportForMissingValuesException("DeltaRulePerceptron: cannot handle missing value");
         }
 
-        _nominalToBinary.input(instance);
-        Instance numericInstance = _nominalToBinary.output();
-        double[] input = new double[_initialWeights.length];
+        getNominalToBinary().input(instance);
+        Instance numericInstance = getNominalToBinary().output();
+        double[] input = new double[getInitialWeights().length];
         input[0] = 1.0;
-        for (int i = 0; i < _predictorList.size(); i++) {
-            input[i + 1] = numericInstance.value(_predictorList.get(i));
+        for (int i = 0; i < getPredictorList().size(); i++) {
+            input[i + 1] = numericInstance.value(getPredictorList().get(i));
         }
         double prediction = calculateOutput(input);
         if (numericInstance.classAttribute().isNumeric()) {
@@ -166,13 +161,13 @@ public class DeltaBatchRule extends SinglePerceptron {
     }
 
     public void setInitialWeight(double[] weights) {
-        _initialWeights = weights;
+        setInitialWeights(weights);
     }
 
     private double calculateOutput(double[] input) {
         double output = 0.0;
-        for (int i = 0; i < _nPredictor + 1; i++) {
-            output += (_lastWeight[i] * input[i]);
+        for (int i = 0; i < getnPredictor() + 1; i++) {
+            output += (getLastWeight()[i] * input[i]);
         }
         return output;
     }
@@ -193,13 +188,61 @@ public class DeltaBatchRule extends SinglePerceptron {
     }
 
     private void initWeight() {
-        if (_initialWeights == null || _initialWeights.length != (_nPredictor + 1)) {
-            _initialWeights = new double[_nPredictor + 1];
+        if (getInitialWeights() == null || getInitialWeights().length != (getnPredictor() + 1)) {
+            setInitialWeights(new double[getnPredictor() + 1]);
             Random random = new Random();
-            for (int i = 0; i < _nPredictor + 1; i++) {
-//                _initialWeights[i] = 0.0;/**/
-                _initialWeights[i] = random.nextDouble();
+            for (int i = 0; i < getnPredictor() + 1; i++) {
+//               initialWeights[i] = 0.0;
+                getInitialWeights()[i] = random.nextDouble();
             }
         }
+    }
+
+    public int getnPredictor() {
+        return nPredictor;
+    }
+
+    public void setnPredictor(int nPredictor) {
+        this.nPredictor = nPredictor;
+    }
+
+    public double[] getInitialWeights() {
+        return initialWeights;
+    }
+
+    public void setInitialWeights(double[] initialWeights) {
+        this.initialWeights = initialWeights;
+    }
+
+    public List<Attribute> getPredictorList() {
+        return predictorList;
+    }
+
+    public void setPredictorList(List<Attribute> predictorList) {
+        this.predictorList = predictorList;
+    }
+
+    public NominalToBinary getNominalToBinary() {
+        return nominalToBinary;
+    }
+
+    public void setNominalToBinary(NominalToBinary nominalToBinary) {
+        this.nominalToBinary = nominalToBinary;
+    }
+
+    public int getnIterationDone() {
+        return nIterationDone;
+    }
+
+    public void setnIterationDone(int nIterationDone) {
+        this.nIterationDone = nIterationDone;
+    }
+
+    public double[] getLastWeight() {
+        return lastWeight;
+    }
+
+    public void setLastWeight(double[] lastWeight) {
+        this.lastWeight = lastWeight;
     }
 }
