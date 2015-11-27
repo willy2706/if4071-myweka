@@ -15,9 +15,10 @@ public class MultiLayerPerceptron extends Classifier {
     private double _learningRate;
     private int _maxIteration;
     private double _momentum;
-    private double _terminationDeltaMSE;
+    private double _terminationMseThreshold;
     private boolean _isVerbose;
     private int _nPredictor;
+    private Double _initialWeight;
     private List<Attribute> _predictorList;
 
     private int[] _neuronPerHiddenLayer;
@@ -33,13 +34,14 @@ public class MultiLayerPerceptron extends Classifier {
         // Initialization with default value
         _learningRate = 0.1;
         _momentum = 0.0;
-        _terminationDeltaMSE = 1e-4;
+        _terminationMseThreshold = 1e-4;
         _maxIteration = 200;
         _neuronPerHiddenLayer = null;
         _neuronPerLayer = null;
         _isLinearOutput = null;
         _nIterationDone = 0;
         _isVerbose = false;
+        _initialWeight = null;
     }
 
     @Override
@@ -86,9 +88,17 @@ public class MultiLayerPerceptron extends Classifier {
                 }
                 // Initialize weight
                 if (layer == 0) {
-                    _neuralNetwork[layer][i].setWeights(generateRandomWeight(_nPredictor + 1));
+                    if (_initialWeight == null) {
+                        _neuralNetwork[layer][i].setWeights(generateRandomWeight(_nPredictor + 1));
+                    } else {
+                        _neuralNetwork[layer][i].setWeights(generateWeights(_initialWeight, _nPredictor + 1));
+                    }
                 } else {
-                    _neuralNetwork[layer][i].setWeights(generateRandomWeight(_neuronPerLayer[layer - 1] + 1));
+                    if (_initialWeight == null) {
+                        _neuralNetwork[layer][i].setWeights(generateRandomWeight(_neuronPerLayer[layer - 1] + 1));
+                    } else {
+                        _neuralNetwork[layer][i].setWeights(generateWeights(_initialWeight, _neuronPerLayer[layer - 1] + 1));
+                    }
                 }
             }
         }
@@ -130,7 +140,6 @@ public class MultiLayerPerceptron extends Classifier {
         }
 
         // Learning Multi Layer Perceptron
-        double prevMse = meanSquareErrorEvaluation(inputs, outputs);
         for (int iter = 0; iter < _maxIteration; iter++) {
 
             // Backprop learning
@@ -144,10 +153,8 @@ public class MultiLayerPerceptron extends Classifier {
             double mseEvaluation = meanSquareErrorEvaluation(inputs, outputs);
             if (_isVerbose) {
                 System.out.println("Epoch " + _nIterationDone + " MSE: " + mseEvaluation);
-                System.out.println("Epoch " + _nIterationDone + " Delta MSE: " + (prevMse - mseEvaluation));
             }
-            if (Math.abs(prevMse - mseEvaluation) < _terminationDeltaMSE) break;
-            prevMse = mseEvaluation;
+            if (mseEvaluation < _terminationMseThreshold) break;
 
             // Output weights
             if (_isVerbose) {
@@ -214,12 +221,12 @@ public class MultiLayerPerceptron extends Classifier {
         _momentum = momentum;
     }
 
-    public double getTerminationDeltaMSE() {
-        return _terminationDeltaMSE;
+    public double getTerminationMseThreshold() {
+        return _terminationMseThreshold;
     }
 
-    public void setTerminationDeltaMSE(double terminationDeltaMSE) {
-        _terminationDeltaMSE = terminationDeltaMSE;
+    public void setTerminationMseThreshold(double terminationDeltaMSE) {
+        _terminationMseThreshold = terminationDeltaMSE;
     }
 
     public boolean isLinearOutput() {
@@ -250,6 +257,14 @@ public class MultiLayerPerceptron extends Classifier {
         _isVerbose = isVerbose;
     }
 
+    public double getInitialWeight() {
+        return _initialWeight;
+    }
+
+    public void setInitialWeight(double initialWeight) {
+        _initialWeight = initialWeight;
+    }
+
     private void outputNeuronsWeights() {
         for (int layer = 0; layer < _neuralNetwork.length; layer++) {
             System.out.println("Layer " + layer);
@@ -269,6 +284,14 @@ public class MultiLayerPerceptron extends Classifier {
         Random random = new Random();
         for (int i = 0; i < length; i++) {
             weights[i] = random.nextDouble();
+        }
+        return weights;
+    }
+
+    private double[] generateWeights(double value, int length) {
+        double[] weights = new double[length];
+        for (int i = 0; i < length; i++) {
+            weights[i] = value;
         }
         return weights;
     }

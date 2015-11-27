@@ -59,7 +59,6 @@ public class DeltaBatchRule extends DeltaRulePerceptron {
 
         // Training Delta Rule Perceptron
         _lastWeight = _initialWeights;
-        double prevMse = meanSquareErrorEvaluation(inputs, targets);
         double[] prevDeltaWeight = null;
         double[] deltaWeight = null;
         for (int it = 0; it < _maxIteration; it++) {
@@ -96,9 +95,7 @@ public class DeltaBatchRule extends DeltaRulePerceptron {
             _nIterationDone = it + 1;
             double mseEvaluation = meanSquareErrorEvaluation(inputs, targets);
             System.out.println("Epoch " + _nIterationDone + " MSE: " + mseEvaluation);
-            System.out.println("Epoch " + _nIterationDone + " Delta MSE: " + (prevMse - mseEvaluation));
-            if (Math.abs(prevMse - mseEvaluation) < _terminationDeltaMSE) break;
-            prevMse = mseEvaluation;
+            if (mseEvaluation < _terminationMseThreshold) break;
 
             // Output weight for each epoch
             System.out.print("Epoch " + _nIterationDone + " Weight: ");

@@ -17,7 +17,7 @@ public class PerceptronTrainingRule extends Classifier {
     private double _learningRate;
     private int _maxIteration;
     private double _momentum;
-    private double _terminationDeltaMSE;
+    private double _terminationMseThreshold;
     private List<Attribute> _predictorList;
 
     private NominalToBinary _nominalToBinary;
@@ -30,7 +30,7 @@ public class PerceptronTrainingRule extends Classifier {
         // Initialization with default value
         _learningRate = 0.1;
         _momentum = 0.0;
-        _terminationDeltaMSE = 1e-4;
+        _terminationMseThreshold = 1e-4;
         _maxIteration = 200;
         _nIterationDone = 0;
     }
@@ -103,7 +103,7 @@ public class PerceptronTrainingRule extends Classifier {
             double mseEvaluation = meanSquareErrorEvaluation(inputs, outputs);
             System.out.println("Epoch " + _nIterationDone + " MSE: " + mseEvaluation);
             System.out.println("Epoch " + _nIterationDone + " Delta MSE: " + (prevMse - mseEvaluation));
-            if (mseEvaluation < _terminationDeltaMSE) break;
+            if (mseEvaluation < _terminationMseThreshold) break;
 
             // Output weight for each epoch
             System.out.print("Epoch " + _nIterationDone + " Weight: ");
@@ -168,12 +168,12 @@ public class PerceptronTrainingRule extends Classifier {
         return _initialWeights;
     }
 
-    public double getTerminationDeltaMSE() {
-        return _terminationDeltaMSE;
+    public double getTerminationMseThreshold() {
+        return _terminationMseThreshold;
     }
 
-    public void setTerminationDeltaMSE(double terminationDeltaMSE) {
-        this._terminationDeltaMSE = terminationDeltaMSE;
+    public void setTerminationMseThreshold(double terminationDeltaMSE) {
+        this._terminationMseThreshold = terminationDeltaMSE;
     }
 
     public double getMomentum() {
