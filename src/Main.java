@@ -105,7 +105,6 @@ public class Main {
             
             switch(input){
                 case 1 : {
-                    System.out.println(trainDataSet);
                     PerceptronTrainingRule ptr = new PerceptronTrainingRule();
                     ptr.setMomentum(momentum);
                     ptr.setLearningRate(learningRate);
