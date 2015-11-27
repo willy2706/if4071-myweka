@@ -4,11 +4,11 @@ import classifier.ann.MultiLayerPerceptron;
 import classifier.ann.PerceptronTrainingRule;
 import classifier.id3.MyId3;
 import classifier.j48.MyJ48;
+import java.io.PrintWriter;
+import java.util.Scanner;
 import weka.classifiers.Evaluation;
 import weka.core.Instances;
 import weka.core.converters.ConverterUtils.DataSource;
-
-import java.util.Scanner;
 
 public class Main {
     public final static String FOLDER = "dataset/";
@@ -112,6 +112,7 @@ public class Main {
                     ptr.setMaxIteration(maxIteration);
                     if(initialWeightMethod==2) {
                         initialWeight = new double[trainInstances.numAttributes()];
+                        System.out.print("Weight awal: ");
                         double weight = reader.nextDouble();
                         for(int i=0;i<trainInstances.numAttributes();++i) {
                             initialWeight[i] = weight;
@@ -128,6 +129,7 @@ public class Main {
                 case 2 : {
                     DeltaBatchRule dbr = new DeltaBatchRule();
                     if(initialWeightMethod==2) {
+                        System.out.print("Weight awal: ");
                         double weight = reader.nextDouble();
                         initialWeight = new double[trainInstances.numAttributes()];
                         for(int i=0;i<trainInstances.numAttributes();++i) {
@@ -147,6 +149,7 @@ public class Main {
                 case 3 : {
                     DeltaRulePerceptron drp = new DeltaRulePerceptron();
                     if(initialWeightMethod==2) {
+                        System.out.print("Weight awal: ");
                         double weight = reader.nextDouble();
                         initialWeight = new double[trainInstances.numAttributes()];
                         for(int i=0;i<trainInstances.numAttributes();++i) {
@@ -166,6 +169,7 @@ public class Main {
                 case 4 : {
                     MultiLayerPerceptron mlp = new MultiLayerPerceptron();
                     if(initialWeightMethod==2) {
+                        System.out.print("Weight awal: ");
                         double weight = reader.nextDouble();
                         mlp.setInitialWeight(weight);
                     }
@@ -217,6 +221,11 @@ public class Main {
 //        evaluation.evaluateModel(multiLayerPerceptron, testInstances);
         System.out.print(evaluation.toMatrixString());
         System.out.println(evaluation.toSummaryString());
+        
+        PrintWriter writer = new PrintWriter("result.txt", "UTF-8");
+        writer.println(evaluation.toMatrixString());
+        writer.println(evaluation.toSummaryString());
+        writer.close();
 
 //        PerceptronTrainingRule perceptronTrainingRule = new PerceptronTrainingRule();
 //        perceptronTrainingRule.setMomentum(0.001);
