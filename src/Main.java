@@ -4,11 +4,12 @@ import classifier.ann.MultiLayerPerceptron;
 import classifier.ann.PerceptronTrainingRule;
 import classifier.id3.MyId3;
 import classifier.j48.MyJ48;
-import java.io.PrintWriter;
-import java.util.Scanner;
 import weka.classifiers.Evaluation;
 import weka.core.Instances;
 import weka.core.converters.ConverterUtils.DataSource;
+
+import java.io.PrintWriter;
+import java.util.Scanner;
 
 public class Main {
     public final static String FOLDER = "dataset/";
@@ -178,8 +179,14 @@ public class Main {
                     mlp.setTerminationMseThreshold(terminationDeltaMSE);
                     mlp.setMaxIteration(maxIteration);
                     mlp.buildClassifier(trainInstances);
-                    //permintaan darwin
-                    mlp.setNeuronPerHiddenLayer(new int[]{5});
+                    System.out.print("Number of hidden layer: ");
+                    int numOfHiddenLayer = reader.nextInt();
+                    int[] neuronPerHiddenLayer = new int[numOfHiddenLayer];
+                    for (int i = 0; i < numOfHiddenLayer; i++) {
+                        System.out.print("Number of neuron for hidden layer-" + (i + 1) + ": ");
+                        neuronPerHiddenLayer[i] = reader.nextInt();
+                    }
+                    mlp.setNeuronPerHiddenLayer(neuronPerHiddenLayer);
                     evaluation.evaluateModel(mlp, testInstances);
                     break;
                 }
