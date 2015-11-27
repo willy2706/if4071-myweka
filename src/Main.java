@@ -178,7 +178,8 @@ public class Main {
                     mlp.setTerminationMseThreshold(terminationDeltaMSE);
                     mlp.setMaxIteration(maxIteration);
                     mlp.buildClassifier(trainInstances);
-                    
+                    //permintaan darwin
+                    mlp.setNeuronPerHiddenLayer(new int[]{5});
                     evaluation.evaluateModel(mlp, testInstances);
                     break;
                 }
