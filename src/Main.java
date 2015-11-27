@@ -83,7 +83,7 @@ public class Main {
             int maxIteration,initialWeightMethod;
             System.out.println("Momentum :"); momentum = reader.nextDouble();
             System.out.println("LearningRate: "); learningRate = reader.nextDouble();
-            System.out.println("terminationDeltaMSE: "); terminationDeltaMSE = reader.nextDouble();
+            System.out.println("terminationMSE: "); terminationDeltaMSE = reader.nextDouble();
             System.out.println("maxIteration: "); maxIteration = reader.nextInt();
             System.out.println("InitialWeight: 1.Random 2.Given"); initialWeightMethod = reader.nextInt();
             
@@ -110,9 +110,9 @@ public class Main {
                     ptr.setTerminationDeltaMSE(terminationDeltaMSE);
                     ptr.setMaxIteration(maxIteration);
                     if(initialWeightMethod==2) {
-                        initialWeight = new double[trainInstances.numAttributes()-1];
+                        initialWeight = new double[trainInstances.numAttributes()];
+                        double weight = reader.nextDouble();
                         for(int i=0;i<trainInstances.numAttributes();++i) {
-                            double weight = reader.nextDouble();
                             initialWeight[i] = weight;
                         }
                         ptr.setInitialWeight(initialWeight);
@@ -127,9 +127,9 @@ public class Main {
                 case 2 : {
                     DeltaBatchRule dbr = new DeltaBatchRule();
                     if(initialWeightMethod==2) {
-                        initialWeight = new double[trainInstances.numAttributes()-1];
+                        double weight = reader.nextDouble();
+                        initialWeight = new double[trainInstances.numAttributes()];
                         for(int i=0;i<trainInstances.numAttributes();++i) {
-                            double weight = reader.nextDouble();
                             initialWeight[i] = weight;
                         }
                         dbr.setInitialWeight(initialWeight);
@@ -146,9 +146,9 @@ public class Main {
                 case 3 : {
                     DeltaRulePerceptron drp = new DeltaRulePerceptron();
                     if(initialWeightMethod==2) {
-                        initialWeight = new double[trainInstances.numAttributes()-1];
+                        double weight = reader.nextDouble();
+                        initialWeight = new double[trainInstances.numAttributes()];
                         for(int i=0;i<trainInstances.numAttributes();++i) {
-                            double weight = reader.nextDouble();
                             initialWeight[i] = weight;
                         }
                         drp.setInitialWeight(initialWeight);
