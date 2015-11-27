@@ -1,6 +1,5 @@
 package classifier.ann;
 
-
 public class Neuron {
 
     private double[] _weights;
@@ -48,5 +47,4 @@ public class Neuron {
         LINEAR,
         SIGMOID
     }
-
 }

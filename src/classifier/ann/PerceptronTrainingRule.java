@@ -1,6 +1,5 @@
 package classifier.ann;
 
-import weka.classifiers.Classifier;
 import weka.core.*;
 import weka.core.matrix.Maths;
 import weka.filters.Filter;
@@ -11,13 +10,9 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.Random;
 
-public class PerceptronTrainingRule extends Classifier {
+public class PerceptronTrainingRule extends SinglePerceptron {
     private int _nPredictor;
     private double[] _initialWeights;
-    private double _learningRate;
-    private int _maxIteration;
-    private double _momentum;
-    private double _terminationMseThreshold;
     private List<Attribute> _predictorList;
 
     private NominalToBinary _nominalToBinary;
@@ -28,10 +23,10 @@ public class PerceptronTrainingRule extends Classifier {
 
     public PerceptronTrainingRule() {
         // Initialization with default value
-        _learningRate = 0.1;
-        _momentum = 0.0;
-        _terminationMseThreshold = 1e-4;
-        _maxIteration = 200;
+        learningRate = 0.1;
+        momentum = 0.0;
+        terminationMseThreshold = 1e-4;
+        maxIteration = 200;
         _nIterationDone = 0;
     }
 
@@ -75,7 +70,7 @@ public class PerceptronTrainingRule extends Classifier {
         _prevWeight = null;
         _lastWeight = _initialWeights;
         double prevMse = meanSquareErrorEvaluation(inputs, outputs);
-        for (int it = 0; it < _maxIteration; it++) {
+        for (int it = 0; it < maxIteration; it++) {
 
             for (int instIndex = 0; instIndex < inputs.length; instIndex++) {
 
@@ -89,8 +84,8 @@ public class PerceptronTrainingRule extends Classifier {
                     } else {
                         prevDeltaWeight = 0;
                     }
-                    double deltaWeight = _learningRate * (outputs[instIndex] - predicted) * inputs[instIndex][i]
-                            + (_momentum * prevDeltaWeight);
+                    double deltaWeight = learningRate * (outputs[instIndex] - predicted) * inputs[instIndex][i]
+                            + (momentum * prevDeltaWeight);
                     newWeight[i] = _lastWeight[i] + deltaWeight;
                 }
 
@@ -103,7 +98,7 @@ public class PerceptronTrainingRule extends Classifier {
             double mseEvaluation = meanSquareErrorEvaluation(inputs, outputs);
             System.out.println("Epoch " + _nIterationDone + " MSE: " + mseEvaluation);
             System.out.println("Epoch " + _nIterationDone + " Delta MSE: " + (prevMse - mseEvaluation));
-            if (mseEvaluation < _terminationMseThreshold) break;
+            if (mseEvaluation < terminationMseThreshold) break;
 
             // Output weight for each epoch
             System.out.print("Epoch " + _nIterationDone + " Weight: ");
@@ -162,46 +157,6 @@ public class PerceptronTrainingRule extends Classifier {
 
     public void setInitialWeight(double[] weights) {
         _initialWeights = weights;
-    }
-
-    public double[] getInitialWeights() {
-        return _initialWeights;
-    }
-
-    public double getTerminationMseThreshold() {
-        return _terminationMseThreshold;
-    }
-
-    public void setTerminationMseThreshold(double terminationDeltaMSE) {
-        this._terminationMseThreshold = terminationDeltaMSE;
-    }
-
-    public double getMomentum() {
-        return _momentum;
-    }
-
-    public void setMomentum(double momentum) {
-        this._momentum = momentum;
-    }
-
-    public int getMaxIteration() {
-        return _maxIteration;
-    }
-
-    public void setMaxIteration(int maxIteration) {
-        this._maxIteration = maxIteration;
-    }
-
-    public double getLearningRate() {
-        return _learningRate;
-    }
-
-    public void setLearningRate(double learningRate) {
-        this._learningRate = learningRate;
-    }
-
-    public int getEpochDone() {
-        return _nIterationDone;
     }
 
     private double calculateOutput(double[] input) {

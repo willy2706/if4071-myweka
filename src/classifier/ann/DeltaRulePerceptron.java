@@ -1,6 +1,5 @@
 package classifier.ann;
 
-import weka.classifiers.Classifier;
 import weka.core.*;
 import weka.core.matrix.Maths;
 import weka.filters.Filter;
@@ -11,28 +10,23 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.Random;
 
-public class DeltaRulePerceptron extends Classifier {
-    protected int _nPredictor;
-    protected double[] _initialWeights;
-    protected double _learningRate;
-    protected int _maxIteration;
-    protected double _momentum;
-    protected double _terminationMseThreshold;
-    protected List<Attribute> _predictorList;
-    protected NominalToBinary _nominalToBinary;
-    protected int _nIterationDone;
-    protected double[] _prevWeight;
-    protected double[] _lastWeight;
-    private boolean _isVerbose;
+public class DeltaRulePerceptron extends SinglePerceptron {
+    private int _nPredictor;
+    private double[] _initialWeights;
+    private List<Attribute> _predictorList;
+    private NominalToBinary _nominalToBinary;
+    private int _nIterationDone;
+    private double[] _prevWeight;
+    private double[] _lastWeight;
 
     public DeltaRulePerceptron() {
         // Initialization with default value
-        _learningRate = 0.1;
-        _momentum = 0.0;
-        _terminationMseThreshold = 1e-4;
-        _maxIteration = 200;
+        learningRate = 0.1;
+        momentum = 0.0;
+        terminationMseThreshold = 1e-4;
+        maxIteration = 200;
         _nIterationDone = 0;
-        _isVerbose = false;
+        verbose = false;
     }
 
     @Override
@@ -77,7 +71,7 @@ public class DeltaRulePerceptron extends Classifier {
         // Training Delta Rule Perceptron
         _prevWeight = null;
         _lastWeight = _initialWeights;
-        for (int it = 0; it < _maxIteration; it++) {
+        for (int it = 0; it < maxIteration; it++) {
 
             for (int instIndex = 0; instIndex < inputs.length; instIndex++) {
 
@@ -91,8 +85,8 @@ public class DeltaRulePerceptron extends Classifier {
                     } else {
                         prevDeltaWeight = 0;
                     }
-                    double deltaWeight = _learningRate * (targets[instIndex] - predicted) * inputs[instIndex][i]
-                            + (_momentum * prevDeltaWeight);
+                    double deltaWeight = learningRate * (targets[instIndex] - predicted) * inputs[instIndex][i]
+                            + (momentum * prevDeltaWeight);
                     newWeight[i] = _lastWeight[i] + deltaWeight;
                 }
 
@@ -103,13 +97,13 @@ public class DeltaRulePerceptron extends Classifier {
 
             _nIterationDone = it + 1;
             double mseEvaluation = meanSquareErrorEvaluation(inputs, targets);
-            if (_isVerbose) {
+            if (verbose) {
                 System.out.println("Epoch " + _nIterationDone + " MSE: " + mseEvaluation);
             }
-            if (mseEvaluation < _terminationMseThreshold) break;
+            if (mseEvaluation < terminationMseThreshold) break;
 
             // Output weight for each epoch
-            if (_isVerbose) {
+            if (verbose) {
                 System.out.print("Epoch " + _nIterationDone + " weights: ");
                 for (int i = 0; i < _initialWeights.length; i++) {
                     System.out.print("" + i + ")" + _lastWeight[i] + " ");
@@ -170,55 +164,7 @@ public class DeltaRulePerceptron extends Classifier {
         _initialWeights = weights;
     }
 
-    public double[] getInitialWeights() {
-        return _initialWeights;
-    }
-
-    public double getTerminationMseThreshold() {
-        return _terminationMseThreshold;
-    }
-
-    public void setTerminationMseThreshold(double terminationDeltaMSE) {
-        this._terminationMseThreshold = terminationDeltaMSE;
-    }
-
-    public double getMomentum() {
-        return _momentum;
-    }
-
-    public void setMomentum(double momentum) {
-        this._momentum = momentum;
-    }
-
-    public int getMaxIteration() {
-        return _maxIteration;
-    }
-
-    public void setMaxIteration(int maxIteration) {
-        this._maxIteration = maxIteration;
-    }
-
-    public double getLearningRate() {
-        return _learningRate;
-    }
-
-    public void setLearningRate(double learningRate) {
-        this._learningRate = learningRate;
-    }
-
-    public int getEpochDone() {
-        return _nIterationDone;
-    }
-
-    public boolean isVerbose() {
-        return _isVerbose;
-    }
-
-    public void setIsVerbose(boolean isVerbose) {
-        _isVerbose = isVerbose;
-    }
-
-    protected double calculateOutput(double[] input) {
+    private double calculateOutput(double[] input) {
         double output = 0.0;
         for (int i = 0; i < _nPredictor + 1; i++) {
             output += (_lastWeight[i] * input[i]);
@@ -226,7 +172,7 @@ public class DeltaRulePerceptron extends Classifier {
         return output;
     }
 
-    protected double meanSquareErrorEvaluation(double[][] instancesInput, double[] target) {
+    private double meanSquareErrorEvaluation(double[][] instancesInput, double[] target) {
         double[] predicted = new double[instancesInput.length];
         // Calculate prediction
         for (int i = 0; i < instancesInput.length; i++) {
@@ -241,7 +187,7 @@ public class DeltaRulePerceptron extends Classifier {
         return mse;
     }
 
-    protected void initWeight() {
+    private void initWeight() {
         if (_initialWeights == null || _initialWeights.length != (_nPredictor + 1)) {
             _initialWeights = new double[_nPredictor + 1];
             Random random = new Random();
