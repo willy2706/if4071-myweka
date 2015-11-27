@@ -42,6 +42,8 @@ public class PerceptronTrainingRule extends SinglePerceptron {
 
         _nPredictor = numericInstances.numAttributes() - 1;
         
+        initWeight();
+        
         // Change input to matrix
         _predictorList = new ArrayList<Attribute>();
         Enumeration attrIterator = numericInstances.enumerateAttributes();
