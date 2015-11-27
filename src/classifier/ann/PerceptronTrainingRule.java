@@ -103,8 +103,7 @@ public class PerceptronTrainingRule extends Classifier {
             double mseEvaluation = meanSquareErrorEvaluation(inputs, outputs);
             System.out.println("Epoch " + _nIterationDone + " MSE: " + mseEvaluation);
             System.out.println("Epoch " + _nIterationDone + " Delta MSE: " + (prevMse - mseEvaluation));
-            if (Math.abs(prevMse - mseEvaluation) < _terminationDeltaMSE) break;
-            prevMse = mseEvaluation;
+            if (mseEvaluation < _terminationDeltaMSE) break;
 
             // Output weight for each epoch
             System.out.print("Epoch " + _nIterationDone + " Weight: ");
