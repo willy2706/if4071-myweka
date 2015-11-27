@@ -48,7 +48,7 @@ public class Main {
         
         System.out.println("Masukkan pilihan model pembelajaran:\n 1. Decision Tree Learning\n 2. Artificial Neural Network");        
         input = reader.nextInt();
-        while(input!=1 || input!=2) {
+        while(input<1 || input>2) {
             System.out.println("Masukan salah");
             System.out.println("Masukkan pilihan model pembelajaran:\n 1. Decision Tree Learning\n 2. Artificial Neural Network");
             input = reader.nextInt();
