@@ -17,7 +17,7 @@ public class DeltaRulePerceptron extends Classifier {
     protected double _learningRate;
     protected int _maxIteration;
     protected double _momentum;
-    protected double _terminationDeltaMSE;
+    protected double _terminationMseThreshold;
     protected List<Attribute> _predictorList;
     protected NominalToBinary _nominalToBinary;
     protected int _nIterationDone;
@@ -29,7 +29,7 @@ public class DeltaRulePerceptron extends Classifier {
         // Initialization with default value
         _learningRate = 0.1;
         _momentum = 0.0;
-        _terminationDeltaMSE = 1e-4;
+        _terminationMseThreshold = 1e-4;
         _maxIteration = 200;
         _nIterationDone = 0;
         _isVerbose = false;
@@ -77,7 +77,6 @@ public class DeltaRulePerceptron extends Classifier {
         // Training Delta Rule Perceptron
         _prevWeight = null;
         _lastWeight = _initialWeights;
-        double prevMse = meanSquareErrorEvaluation(inputs, targets);
         for (int it = 0; it < _maxIteration; it++) {
 
             for (int instIndex = 0; instIndex < inputs.length; instIndex++) {
@@ -106,10 +105,8 @@ public class DeltaRulePerceptron extends Classifier {
             double mseEvaluation = meanSquareErrorEvaluation(inputs, targets);
             if (_isVerbose) {
                 System.out.println("Epoch " + _nIterationDone + " MSE: " + mseEvaluation);
-                System.out.println("Epoch " + _nIterationDone + " Delta MSE: " + (prevMse - mseEvaluation));
             }
-            if (Math.abs(prevMse - mseEvaluation) < _terminationDeltaMSE) break;
-            prevMse = mseEvaluation;
+            if (mseEvaluation < _terminationMseThreshold) break;
 
             // Output weight for each epoch
             if (_isVerbose) {
@@ -177,12 +174,12 @@ public class DeltaRulePerceptron extends Classifier {
         return _initialWeights;
     }
 
-    public double getTerminationDeltaMSE() {
-        return _terminationDeltaMSE;
+    public double getTerminationMseThreshold() {
+        return _terminationMseThreshold;
     }
 
-    public void setTerminationDeltaMSE(double terminationDeltaMSE) {
-        this._terminationDeltaMSE = terminationDeltaMSE;
+    public void setTerminationMseThreshold(double terminationDeltaMSE) {
+        this._terminationMseThreshold = terminationDeltaMSE;
     }
 
     public double getMomentum() {

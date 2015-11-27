@@ -1,14 +1,14 @@
-
 import classifier.ann.DeltaBatchRule;
 import classifier.ann.DeltaRulePerceptron;
 import classifier.ann.MultiLayerPerceptron;
 import classifier.ann.PerceptronTrainingRule;
 import classifier.id3.MyId3;
 import classifier.j48.MyJ48;
-import java.util.Scanner;
 import weka.classifiers.Evaluation;
 import weka.core.Instances;
 import weka.core.converters.ConverterUtils.DataSource;
+
+import java.util.Scanner;
 
 public class Main {
     public final static String FOLDER = "dataset/";
@@ -107,7 +107,7 @@ public class Main {
                     PerceptronTrainingRule ptr = new PerceptronTrainingRule();
                     ptr.setMomentum(momentum);
                     ptr.setLearningRate(learningRate);
-                    ptr.setTerminationDeltaMSE(terminationDeltaMSE);
+                    ptr.setTerminationMseThreshold(terminationDeltaMSE);
                     ptr.setMaxIteration(maxIteration);
                     if(initialWeightMethod==2) {
                         initialWeight = new double[trainInstances.numAttributes()];
@@ -136,7 +136,7 @@ public class Main {
                     }
                     dbr.setMomentum(momentum);
                     dbr.setLearningRate(learningRate);
-                    dbr.setTerminationDeltaMSE(terminationDeltaMSE);
+                    dbr.setTerminationMseThreshold(terminationDeltaMSE);
                     dbr.setMaxIteration(maxIteration);
                     dbr.buildClassifier(trainInstances);
                     evaluation.evaluateModel(dbr, testInstances);
@@ -155,7 +155,7 @@ public class Main {
                     }
                     drp.setMomentum(momentum);
                     drp.setLearningRate(learningRate);
-                    drp.setTerminationDeltaMSE(terminationDeltaMSE);
+                    drp.setTerminationMseThreshold(terminationDeltaMSE);
                     drp.setMaxIteration(maxIteration);
                     drp.buildClassifier(trainInstances);
                     evaluation.evaluateModel(drp, testInstances);
@@ -175,7 +175,7 @@ public class Main {
 //                    }
                     mlp.setMomentum(momentum);
                     mlp.setLearningRate(learningRate);
-                    mlp.setTerminationDeltaMSE(terminationDeltaMSE);
+                    mlp.setTerminationMseThreshold(terminationDeltaMSE);
                     mlp.setMaxIteration(maxIteration);
                     mlp.buildClassifier(trainInstances);
                     
@@ -201,7 +201,7 @@ public class Main {
 //        deltaRulePerceptron.setMomentum(0.001);
 //        deltaRulePerceptron.setMaxIteration(100);
 //        deltaRulePerceptron.setLearningRate(0.01);
-//        deltaRulePerceptron.setTerminationDeltaMSE(1e-10);
+//        deltaRulePerceptron.setTerminationMseThreshold(1e-10);
 //        deltaRulePerceptron.buildClassifier(trainInstances);
 //        datasource = new DataSource(TRAINDATASETJ48);
 //        Instances testInstances = datasource.getDataSet();
@@ -214,7 +214,7 @@ public class Main {
 //        multiLayerPerceptron.setMomentum(0.1);
 //        multiLayerPerceptron.setMaxIteration(300);
 //        multiLayerPerceptron.setLearningRate(0.5);
-//        multiLayerPerceptron.setTerminationDeltaMSE(1e-10);
+//        multiLayerPerceptron.setTerminationMseThreshold(1e-10);
 //        multiLayerPerceptron.setNeuronPerHiddenLayer(new int[]{5, 3});
 //        multiLayerPerceptron.buildClassifier(trainInstances);
 //        
@@ -226,7 +226,7 @@ public class Main {
 //        perceptronTrainingRule.setMomentum(0.001);
 //        perceptronTrainingRule.setMaxIteration(100);
 //        perceptronTrainingRule.setLearningRate(0.0001);
-//        perceptronTrainingRule.setTerminationDeltaMSE(1e-10);
+//        perceptronTrainingRule.setTerminationMseThreshold(1e-10);
 //        perceptronTrainingRule.buildClassifier(trainInstances);
 //        datasource = new DataSource(TESTDATASETJ48);
 //        Instances testInstances = datasource.getDataSet();
