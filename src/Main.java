@@ -48,7 +48,7 @@ public class Main {
         
         System.out.println("Masukkan pilihan model pembelajaran:\n 1. Decision Tree Learning\n 2. Artificial Neural Network");        
         input = reader.nextInt();
-        while(input!=1 || input!=2) {
+        while(input<1 || input>2) {
             System.out.println("Masukan salah");
             System.out.println("Masukkan pilihan model pembelajaran:\n 1. Decision Tree Learning\n 2. Artificial Neural Network");
             input = reader.nextInt();
@@ -58,13 +58,14 @@ public class Main {
                     + "1. ID3\n"
                     + "2. C4.5");
             input = reader.nextInt();
-            while(input!=1 || input!=2) {
+            while(input<1 || input>2) {
                 System.out.println("Masukkan algoritma pembelajaran:\n"
                     + "1. ID3\n"
                     + "2. C4.5");
             input = reader.nextInt();
             }
             if(input ==1) { //ID3
+                System.out.println(TRAINDATASET);
                 MyId3 id3 = new MyId3();
                 id3.buildClassifier(trainInstances);
                 evaluation.evaluateModel(id3, testInstances);
@@ -104,6 +105,7 @@ public class Main {
             
             switch(input){
                 case 1 : {
+                    System.out.println(trainDataSet);
                     PerceptronTrainingRule ptr = new PerceptronTrainingRule();
                     ptr.setMomentum(momentum);
                     ptr.setLearningRate(learningRate);
@@ -164,15 +166,10 @@ public class Main {
                 
                 case 4 : {
                     MultiLayerPerceptron mlp = new MultiLayerPerceptron();
-                    //TODO init weight and neuron hidden per layer
-//                    if(initialWeightMethod==2) {
-//                        initialWeight = new double[trainInstances.numAttributes()-1];
-//                        for(int i=0;i<trainInstances.numAttributes()-1;++i) {
-//                            double weight = reader.nextDouble();
-//                            initialWeight[i] = weight;
-//                        }
-//                        dbr.setInitialWeight(initialWeight);
-//                    }
+                    if(initialWeightMethod==2) {
+                        double weight = reader.nextDouble();
+                        mlp.setInitialWeight(weight);
+                    }
                     mlp.setMomentum(momentum);
                     mlp.setLearningRate(learningRate);
                     mlp.setTerminationMseThreshold(terminationDeltaMSE);
