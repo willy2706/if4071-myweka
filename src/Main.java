@@ -135,9 +135,11 @@ public class Main {
                         initialWeight = new double[trainInstances.numAttributes()];
                         System.out.print("Weight awal: ");
                         double weight = reader.nextDouble();
-                        for(int i=0;i<trainInstances.numAttributes()+1;++i) {
+                        //penjelasan: karena attribut output dianggap dipindah menjadi x0, maka jumlah tetap sama
+                        for(int i=0;i<trainInstances.numAttributes();++i) {
                             initialWeight[i] = weight;
                         }
+                        ptr.setInitialWeight(initialWeight);
                     } else {
                         ptr.initWeight();
                     }
@@ -152,7 +154,7 @@ public class Main {
                         System.out.print("Weight awal: ");
                         double weight = reader.nextDouble();
                         initialWeight = new double[trainInstances.numAttributes()];
-                        for(int i=0;i<trainInstances.numAttributes()+1;++i) {
+                        for(int i=0;i<trainInstances.numAttributes();++i) {
                             initialWeight[i] = weight;
                         }
                         dbr.setInitialWeight(initialWeight);
@@ -172,7 +174,7 @@ public class Main {
                         System.out.print("Weight awal: ");
                         double weight = reader.nextDouble();
                         initialWeight = new double[trainInstances.numAttributes()];
-                        for(int i=0;i<trainInstances.numAttributes()+1;++i) {
+                        for(int i=0;i<trainInstances.numAttributes();++i) {
                             initialWeight[i] = weight;
                         }
                         drp.setInitialWeight(initialWeight);
