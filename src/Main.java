@@ -58,6 +58,18 @@ public class Main {
 //        deltaBatchRule.buildClassifier(trainInstances);
 //        evaluation.evaluateModel(deltaBatchRule, testInstances);
 
+//        MultiLayerPerceptron multiLayerPerceptron = new MultiLayerPerceptron();
+//        multiLayerPerceptron.setInitialWeight(0.0);
+//        multiLayerPerceptron.setLearningRate(0.1);
+//        multiLayerPerceptron.setMaxIteration(10);
+//        multiLayerPerceptron.setMomentum(0);
+//        multiLayerPerceptron.setIsVerbose(true);
+//        multiLayerPerceptron.setTerminationMseThreshold(0.01);
+//        multiLayerPerceptron.setNeuronPerHiddenLayer(new int[]{2});
+//        multiLayerPerceptron.setIsLinearOutput(false);
+//        multiLayerPerceptron.buildClassifier(trainInstances);
+//        evaluation.evaluateModel(multiLayerPerceptron, testInstances);
+
         System.out.println("Masukkan pilihan model pembelajaran:\n 1. Decision Tree Learning\n 2. Artificial Neural Network");        
         input = reader.nextInt();
         while(input<1 || input>2) {
@@ -199,7 +211,6 @@ public class Main {
                     mlp.setLearningRate(learningRate);
                     mlp.setTerminationMseThreshold(terminationDeltaMSE);
                     mlp.setMaxIteration(maxIteration);
-                    mlp.buildClassifier(trainInstances);
                     System.out.print("Number of hidden layer: ");
                     int numOfHiddenLayer = reader.nextInt();
                     int[] neuronPerHiddenLayer = new int[numOfHiddenLayer];
@@ -208,6 +219,16 @@ public class Main {
                         neuronPerHiddenLayer[i] = reader.nextInt();
                     }
                     mlp.setNeuronPerHiddenLayer(neuronPerHiddenLayer);
+                    System.out.println("Masukkan pilihan output layer:\n"
+                            + "1. Linear output\n"
+                            + "2. Sigmoid output");
+                    input = reader.nextInt();
+                    if (input == 1) {
+                        mlp.setIsLinearOutput(true);
+                    } else {
+                        mlp.setIsLinearOutput(false);
+                    }
+                    mlp.buildClassifier(trainInstances);
                     evaluation.evaluateModel(mlp, testInstances);
                     break;
                 }

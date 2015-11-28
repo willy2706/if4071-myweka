@@ -40,7 +40,7 @@ public class MultiLayerPerceptron extends Classifier {
         _neuronPerLayer = null;
         _isLinearOutput = null;
         _nIterationDone = 0;
-        _isVerbose = false;
+        _isVerbose = true;
         _initialWeight = null;
     }
 

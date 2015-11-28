@@ -17,7 +17,7 @@ public abstract class SinglePerceptron extends Classifier {
         setMomentum(0.0);
         setTerminationMseThreshold(1e-4);
         setMaxIteration(200);
-        setVerbose(false);
+        setVerbose(true);
     }
     public boolean isVerbose() {
         return verbose;
