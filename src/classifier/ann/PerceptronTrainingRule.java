@@ -1,5 +1,6 @@
 package classifier.ann;
 
+import common.util.ActivationFunction;
 import weka.core.*;
 import weka.core.matrix.Maths;
 import weka.filters.Filter;
@@ -21,8 +22,11 @@ public class PerceptronTrainingRule extends SinglePerceptron {
     private double[] _prevWeight;
     private double[] _lastWeight;
 
+    private ActivationFunction activationFunction;
+
     public PerceptronTrainingRule() {
         super();
+        setActivationFunction(ActivationFunction.SIGN);
         _nIterationDone = 0;
     }
 
@@ -162,11 +166,8 @@ public class PerceptronTrainingRule extends SinglePerceptron {
         for (int i = 0; i < _nPredictor + 1; i++) {
             output += (_lastWeight[i] * input[i]);
         }
-        
-//        sign activation function
-        if(output >= 0.0 ) { output =1.0; }
-        else { output = 0.0; }
-        return output;
+
+        return activationFunction.calculateOutput(output);
     }
 
     private double meanSquareErrorEvaluation(double[][] instancesInput, double[] target) {
@@ -194,4 +195,11 @@ public class PerceptronTrainingRule extends SinglePerceptron {
         }
     }
 
+    public ActivationFunction getActivationFunction() {
+        return activationFunction;
+    }
+
+    public void setActivationFunction(ActivationFunction activationFunction) {
+        this.activationFunction = activationFunction;
+    }
 }

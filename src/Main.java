@@ -4,6 +4,7 @@ import classifier.ann.MultiLayerPerceptron;
 import classifier.ann.PerceptronTrainingRule;
 import classifier.id3.MyId3;
 import classifier.j48.MyJ48;
+import common.util.ActivationFunction;
 import weka.classifiers.Evaluation;
 import weka.core.Instances;
 import weka.core.converters.ConverterUtils.DataSource;
@@ -46,7 +47,17 @@ public class Main {
         testInstances.setClassIndex(testInstances.numAttributes() - 1);
         
         Evaluation evaluation = new Evaluation(trainInstances);
-        
+        //masayu.dataset1.arff
+//        PerceptronTrainingRule deltaBatchRule = new PerceptronTrainingRule();
+//        deltaBatchRule.setInitialWeight(new double[]{0,0,0,0});
+//        deltaBatchRule.setLearningRate(0.1);
+//        deltaBatchRule.setMaxIteration(10);
+//        deltaBatchRule.setMomentum(0);
+//        deltaBatchRule.setVerbose(true);
+//        deltaBatchRule.setTerminationMseThreshold(0.01);
+//        deltaBatchRule.buildClassifier(trainInstances);
+//        evaluation.evaluateModel(deltaBatchRule, testInstances);
+
         System.out.println("Masukkan pilihan model pembelajaran:\n 1. Decision Tree Learning\n 2. Artificial Neural Network");        
         input = reader.nextInt();
         while(input<1 || input>2) {
@@ -106,19 +117,27 @@ public class Main {
             
             switch(input){
                 case 1 : {
+                    System.out.println("Masukkan pilihan fungsi aktivasi:\n"
+                            + "1. Sign\n"
+                            + "2. Step");
+                    input = reader.nextInt();
                     PerceptronTrainingRule ptr = new PerceptronTrainingRule();
                     ptr.setMomentum(momentum);
                     ptr.setLearningRate(learningRate);
                     ptr.setTerminationMseThreshold(terminationDeltaMSE);
                     ptr.setMaxIteration(maxIteration);
+                    if (input == 1) {
+                        ptr.setActivationFunction(ActivationFunction.SIGN);
+                    } else if (input == 2) {
+                        ptr.setActivationFunction(ActivationFunction.STEP);
+                    }
                     if(initialWeightMethod==2) {
                         initialWeight = new double[trainInstances.numAttributes()];
                         System.out.print("Weight awal: ");
                         double weight = reader.nextDouble();
-                        for(int i=0;i<trainInstances.numAttributes();++i) {
+                        for(int i=0;i<trainInstances.numAttributes()+1;++i) {
                             initialWeight[i] = weight;
                         }
-                        ptr.setInitialWeight(initialWeight);
                     } else {
                         ptr.initWeight();
                     }
@@ -133,7 +152,7 @@ public class Main {
                         System.out.print("Weight awal: ");
                         double weight = reader.nextDouble();
                         initialWeight = new double[trainInstances.numAttributes()];
-                        for(int i=0;i<trainInstances.numAttributes();++i) {
+                        for(int i=0;i<trainInstances.numAttributes()+1;++i) {
                             initialWeight[i] = weight;
                         }
                         dbr.setInitialWeight(initialWeight);
@@ -153,7 +172,7 @@ public class Main {
                         System.out.print("Weight awal: ");
                         double weight = reader.nextDouble();
                         initialWeight = new double[trainInstances.numAttributes()];
-                        for(int i=0;i<trainInstances.numAttributes();++i) {
+                        for(int i=0;i<trainInstances.numAttributes()+1;++i) {
                             initialWeight[i] = weight;
                         }
                         drp.setInitialWeight(initialWeight);
@@ -192,41 +211,7 @@ public class Main {
                 }
             }
         }
-        
-        /*what we will use*/
-//        DeltaBatchRule deltaBatchRule = new DeltaBatchRule();
-//        deltaBatchRule.setInitialWeight(1.0);
-//        deltaBatchRule.setMaxIterate(10);
-//        deltaBatchRule.buildClassifier(trainInstances);;
-//        datasource = new DataSource(TESTDATASETJ48);
-//        Instances testInstances = datasource.getDataSet();
-//        testInstances.setClassIndex(testInstances.numAttributes()-1);
-//        evaluation.evaluateModel(deltaBatchRule, testInstances);
-//        System.out.print(evaluation.toMatrixString());
-//        System.out.println(evaluation.toSummaryString());
 
-//        DeltaRulePerceptron deltaRulePerceptron = new DeltaRulePerceptron();
-//        deltaRulePerceptron.setMomentum(0.001);
-//        deltaRulePerceptron.setMaxIteration(100);
-//        deltaRulePerceptron.setLearningRate(0.01);
-//        deltaRulePerceptron.setTerminationMseThreshold(1e-10);
-//        deltaRulePerceptron.buildClassifier(trainInstances);
-//        datasource = new DataSource(TRAINDATASETJ48);
-//        Instances testInstances = datasource.getDataSet();
-//        testInstances.setClassIndex(testInstances.numAttributes()-1);
-//        evaluation.evaluateModel(deltaRulePerceptron, testInstances);
-//        System.out.print(evaluation.toMatrixString());
-//        System.out.println(evaluation.toSummaryString());
-
-//        MultiLayerPerceptron multiLayerPerceptron = new MultiLayerPerceptron();
-//        multiLayerPerceptron.setMomentum(0.1);
-//        multiLayerPerceptron.setMaxIteration(300);
-//        multiLayerPerceptron.setLearningRate(0.5);
-//        multiLayerPerceptron.setTerminationMseThreshold(1e-10);
-//        multiLayerPerceptron.setNeuronPerHiddenLayer(new int[]{5, 3});
-//        multiLayerPerceptron.buildClassifier(trainInstances);
-//        
-//        evaluation.evaluateModel(multiLayerPerceptron, testInstances);
         System.out.print(evaluation.toMatrixString());
         System.out.println(evaluation.toSummaryString());
         
@@ -234,28 +219,5 @@ public class Main {
         writer.println(evaluation.toMatrixString());
         writer.println(evaluation.toSummaryString());
         writer.close();
-
-//        PerceptronTrainingRule perceptronTrainingRule = new PerceptronTrainingRule();
-//        perceptronTrainingRule.setMomentum(0.001);
-//        perceptronTrainingRule.setMaxIteration(100);
-//        perceptronTrainingRule.setLearningRate(0.0001);
-//        perceptronTrainingRule.setTerminationMseThreshold(1e-10);
-//        perceptronTrainingRule.buildClassifier(trainInstances);
-//        datasource = new DataSource(TESTDATASETJ48);
-//        Instances testInstances = datasource.getDataSet();
-//        testInstances.setClassIndex(testInstances.numAttributes()-1);
-//        evaluation.evaluateModel(perceptronTrainingRule, testInstances);
-//        System.out.print(evaluation.toMatrixString());
-//        System.out.println(evaluation.toSummaryString());
-
-        // dari WEKA
-//        J48 j48 = new J48();
-//        j48.buildClassifier(trainInstances);
-//        DataSource wekadatasource = new DataSource(TESTDATASETJ48);
-//        Instances wekaTestInstances = wekadatasource.getDataSet();
-//        wekaTestInstances.setClassIndex(wekaTestInstances.numAttributes()-1);
-//        wekaEvaluation.evaluateModel(j48, wekaTestInstances);
-//        System.out.print(evaluation.toMatrixString());
-//        System.out.println(evaluation.toSummaryString());
     }
 }

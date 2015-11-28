@@ -16,7 +16,7 @@ import java.util.Random;
 public class DeltaBatchRule extends SinglePerceptron {
 
     private int nPredictor;
-    private double[] initialWeights;
+    private double[] initialWeight;
     private List<Attribute> predictorList;
     private NominalToBinary nominalToBinary;
     private int nIterationDone;
@@ -54,7 +54,7 @@ public class DeltaBatchRule extends SinglePerceptron {
             getPredictorList().add(attr);
         }
 
-        double[][] inputs = new double[numericInstances.numInstances()][getInitialWeights().length];
+        double[][] inputs = new double[numericInstances.numInstances()][getInitialWeight().length];
         double[] targets = new double[numericInstances.numInstances()];
 
         for (int instIndex = 0; instIndex < numericInstances.numInstances(); instIndex++) {
@@ -67,21 +67,21 @@ public class DeltaBatchRule extends SinglePerceptron {
         }
 
         // Training Delta Rule Perceptron
-        setLastWeight(getInitialWeights());
+        setLastWeight(getInitialWeight());
         double[] prevDeltaWeight = null;
         double[] deltaWeight = null;
         for (int it = 0; it < getMaxIteration(); it++) {
             if (it > 0) {
                 prevDeltaWeight = deltaWeight;
             } else {
-                prevDeltaWeight = new double[getInitialWeights().length];
+                prevDeltaWeight = new double[getInitialWeight().length];
                 for (int z = 0; z < prevDeltaWeight.length; ++z) {
                     prevDeltaWeight[z] = 0.0;
                 }
             }
-            double[] newWeight = new double[getInitialWeights().length];
+            double[] newWeight = new double[getInitialWeight().length];
 
-            deltaWeight = new double[getInitialWeights().length];
+            deltaWeight = new double[getInitialWeight().length];
             for (int z = 0; z < deltaWeight.length; ++z) {
                 deltaWeight[z] = 0.0;
             }
@@ -108,7 +108,7 @@ public class DeltaBatchRule extends SinglePerceptron {
 
             // Output weight for each epoch
             System.out.print("Epoch " + getnIterationDone() + " Weight: ");
-            for (int i = 0; i < getInitialWeights().length; i++) {
+            for (int i = 0; i < getInitialWeight().length; i++) {
                 System.out.print("" + i + ")" + getLastWeight()[i] + " ");
             }
             System.out.println();
@@ -124,7 +124,7 @@ public class DeltaBatchRule extends SinglePerceptron {
 
         getNominalToBinary().input(instance);
         Instance numericInstance = getNominalToBinary().output();
-        double[] input = new double[getInitialWeights().length];
+        double[] input = new double[getInitialWeight().length];
         input[0] = 1.0;
         for (int i = 0; i < getPredictorList().size(); i++) {
             input[i + 1] = numericInstance.value(getPredictorList().get(i));
@@ -160,10 +160,6 @@ public class DeltaBatchRule extends SinglePerceptron {
         return result;
     }
 
-    public void setInitialWeight(double[] weights) {
-        setInitialWeights(weights);
-    }
-
     private double calculateOutput(double[] input) {
         double output = 0.0;
         for (int i = 0; i < getnPredictor() + 1; i++) {
@@ -188,61 +184,61 @@ public class DeltaBatchRule extends SinglePerceptron {
     }
 
     private void initWeight() {
-        if (getInitialWeights() == null || getInitialWeights().length != (getnPredictor() + 1)) {
-            setInitialWeights(new double[getnPredictor() + 1]);
+        if (getInitialWeight() == null || getInitialWeight().length != (getnPredictor() + 1)) {
+            setInitialWeight(new double[getnPredictor() + 1]);
             Random random = new Random();
             for (int i = 0; i < getnPredictor() + 1; i++) {
-//               initialWeights[i] = 0.0;
-                getInitialWeights()[i] = random.nextDouble();
+//               initialWeight[i] = 0.0;
+                getInitialWeight()[i] = random.nextDouble();
             }
         }
     }
 
-    public int getnPredictor() {
+    private int getnPredictor() {
         return nPredictor;
     }
 
-    public void setnPredictor(int nPredictor) {
+    private void setnPredictor(int nPredictor) {
         this.nPredictor = nPredictor;
     }
 
-    public double[] getInitialWeights() {
-        return initialWeights;
+    public double[] getInitialWeight() {
+        return initialWeight;
     }
 
-    public void setInitialWeights(double[] initialWeights) {
-        this.initialWeights = initialWeights;
+    public void setInitialWeight(double[] initialWeight) {
+        this.initialWeight = initialWeight;
     }
 
-    public List<Attribute> getPredictorList() {
+    private List<Attribute> getPredictorList() {
         return predictorList;
     }
 
-    public void setPredictorList(List<Attribute> predictorList) {
+    private void setPredictorList(List<Attribute> predictorList) {
         this.predictorList = predictorList;
     }
 
-    public NominalToBinary getNominalToBinary() {
+    private NominalToBinary getNominalToBinary() {
         return nominalToBinary;
     }
 
-    public void setNominalToBinary(NominalToBinary nominalToBinary) {
+    private void setNominalToBinary(NominalToBinary nominalToBinary) {
         this.nominalToBinary = nominalToBinary;
     }
 
-    public int getnIterationDone() {
+    private int getnIterationDone() {
         return nIterationDone;
     }
 
-    public void setnIterationDone(int nIterationDone) {
+    private void setnIterationDone(int nIterationDone) {
         this.nIterationDone = nIterationDone;
     }
 
-    public double[] getLastWeight() {
+    private double[] getLastWeight() {
         return lastWeight;
     }
 
-    public void setLastWeight(double[] lastWeight) {
+    private void setLastWeight(double[] lastWeight) {
         this.lastWeight = lastWeight;
     }
 }
