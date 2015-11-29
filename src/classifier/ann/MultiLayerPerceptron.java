@@ -192,18 +192,18 @@ public class MultiLayerPerceptron extends Classifier {
                 predicted[i] += pad;
             }
 
-        }
-
-        // Normalize, sum of predicted equals 1
-        double sum = 0;
-        for (int i = 0; i < predicted.length; i++) {
-            sum += predicted[i];
-        }
-        if (sum > 0) {
+            // Normalize, sum of predicted equals 1
+            double sum = 0;
             for (int i = 0; i < predicted.length; i++) {
-                predicted[i] /= sum;
+                sum += predicted[i];
+            }
+            if (sum > 0) {
+                for (int i = 0; i < predicted.length; i++) {
+                    predicted[i] /= sum;
+                }
             }
         }
+
         return predicted;
     }
 
