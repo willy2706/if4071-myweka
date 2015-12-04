@@ -177,7 +177,34 @@ public class MultiLayerPerceptron extends Classifier {
             input[i] = numericInstance.value(_predictorList.get(i));
         }
 
-        return calculateOutput(input);
+        // Predict
+        double[] predicted = calculateOutput(input);
+
+        // Remove minus value if nominal
+        if (instance.classAttribute().isNominal()) {
+            double pad = 0.0;
+            for (int i = 0; i < predicted.length; i++) {
+                if (predicted[i] < 0) {
+                    pad = Math.max(pad, Math.abs(predicted[i]));
+                }
+            }
+            for (int i = 0; i < predicted.length; i++) {
+                predicted[i] += pad;
+            }
+
+            // Normalize, sum of predicted equals 1
+            double sum = 0;
+            for (int i = 0; i < predicted.length; i++) {
+                sum += predicted[i];
+            }
+            if (sum > 0) {
+                for (int i = 0; i < predicted.length; i++) {
+                    predicted[i] /= sum;
+                }
+            }
+        }
+
+        return predicted;
     }
 
     @Override
